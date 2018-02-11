@@ -1,0 +1,58 @@
+{
+  "ball": {
+    "class": "Ball",
+    "shape": {
+      "center": {
+        "x": 2.0,
+        "y": 2.0
+      },
+      "angle": 0.0,
+      "radius": 0.5
+    },
+    "properties": {
+      "density": 1.0,
+      "restitution": 0.1,
+      "body_type": 2
+    }
+  },
+  "puio1": {
+    "class": "PUIO",
+    "shape": {
+      "type": "rectangle",
+      "center": {
+        "x": 2.0,
+        "y": 2.0
+      },
+      "angle": 0.0,
+      "size": {
+        "w": 2.0,
+        "h": 0.25
+      }
+    },
+    "properties": {
+      "density": 1.0,
+      "restitution": 0.1,
+      "body_type": 2
+    }
+  },
+  "puio2": {
+    "class": "PUIO",
+    "shape": {
+      "type": "rectangle",
+      "center": {
+        "x": 2.0,
+        "y": 2.0
+      },
+      "angle": 0.0,
+      "size": {
+        "w": 2.0,
+        "h": 0.25
+      }
+    },
+    "properties": {
+      "density": 1.0,
+      "restitution": 0.1,
+      "body_type": 2
+    }
+  }
+}
