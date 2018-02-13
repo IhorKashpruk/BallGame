@@ -26,8 +26,8 @@ namespace level {
         void buildNextLevel() {
             if((int)count_of_levels > (currentLevel+1)) {
                 if(JsonReader::exists(levels[currentLevel+1])) {
-                    WorldContext<WorldLogic, pt::Rectangle>* worldContext
-                            = dynamic_cast<WorldContext<WorldLogic, pt::Rectangle> *>
+                    WorldUIO<WorldLogic, pt::Rectangle>* worldContext
+                            = dynamic_cast<WorldUIO<WorldLogic, pt::Rectangle> *>
                             (ContextManager::getInstance().get("game_context")->get("world_context"));
                     worldContext->removeAll();
                     worldContext->resetWorld(new box2d::WorldWrapper());

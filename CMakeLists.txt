@@ -27,7 +27,7 @@ set(SOURCE_FILES main.cpp
         src/ui/UIO.h
         src/ui/interfaces/IDimensional.h
         src/Draftsman.h
-        src/ui/PUIO.h
+        src/ui/physics/PUIO.h
         src/ui/AChecker.h
         src/ui/Context.h
         src/utility/P_P_M.h
@@ -48,12 +48,12 @@ set(SOURCE_FILES main.cpp
         src/ui/logic/GameLogic.h
         src/ui/Text.h
         src/ui/ColorScheme.h
-        src/ui/physics/WorldContext.h
+        src/ui/physics/WorldUIO.h
         src/ui/logic/Camera.h
         src/ui/logic/WorldLogic.h
-        src/ui/Ball.h
+        src/ui/physics/Ball.h
         src/ui/logic/AfterGameLogic.h
-        src/JsonReader.h src/LevelManager.h src/ui/Windmill.h)
+        src/JsonReader.h src/LevelManager.h src/ui/physics/Windmill.h src/ui/interfaces/Identity.h src/ui/interfaces/Colorful.h src/ui/Label.h src/ui/interfaces/IText.h src/ui/physics/Influential.h)
 
 include_directories(src)
 include_directories(src/libs)

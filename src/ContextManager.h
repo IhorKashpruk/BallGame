@@ -6,11 +6,11 @@
 
 class ContextManager {
     NOW_YOU_ARE_SINGELTON(ContextManager)
-    typedef std::shared_ptr<Context>    context_ptr;
-    typedef std::weak_ptr<Context>      weak_context_ptr;
-    typedef std::vector<context_ptr>    vector_context_ptr;
+    typedef std::shared_ptr<IdentityContext>    context_ptr;
+    typedef std::weak_ptr<IdentityContext>      weak_context_ptr;
+    typedef std::vector<context_ptr>            vector_context_ptr;
 public:
-    ContextManager& add(Context* context) {
+    ContextManager& add(IdentityContext* context) {
         contexts_.push_back(context_ptr(context));
         return *this;
     }

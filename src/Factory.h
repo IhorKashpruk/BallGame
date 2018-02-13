@@ -4,10 +4,10 @@
 #include <libs/json.hpp>
 #include <utility/primitive_types.h>
 #include <ui/physics/PO.h>
-#include <ui/physics/WorldContext.h>
+#include <ui/physics/WorldUIO.h>
 #include <ui/logic/WorldLogic.h>
-#include <ui/Ball.h>
-#include <ui/Windmill.h>
+#include <ui/physics/Ball.h>
+#include <ui/physics/Windmill.h>
 
 using json = nlohmann::json;
 
@@ -89,13 +89,14 @@ void from_json(const json& j, b2Vec2& p) {
 
 
 void to_json(json& j, const b2BodyDef& bodyDef) {
-    j = json{{"type", (int)bodyDef.type}, {"position", bodyDef.position}, {"angle", bodyDef.angle}};
+    j = json{{"type", (int)bodyDef.type}, {"position", bodyDef.position}, {"angle", bodyDef.angle}, {"bullet", bodyDef.bullet}};
 }
 
 void from_json(const json& j, b2BodyDef& bodyDef) {
     bodyDef.type = (b2BodyType)j.at("type").get<int>();
     bodyDef.position = j.at("position").get<b2Vec2>();
     bodyDef.angle = j.at("angle").get<float>();
+    bodyDef.bullet = j.at("bullet").get<float>();
 }
 
 void to_json(json& j, const b2CircleShape& circleShape) {
@@ -122,7 +123,7 @@ void from_json(const json& j, b2PolygonShape& polygonShape) {
         for (auto &point: j["points"]) {
             tmp.push_back(point.get<b2Vec2>());
         }
-        polygonShape.Set(&tmp[0], tmp.size());
+        polygonShape.Set(&tmp[0], (int32)(tmp.size()));
     }
 }
 
@@ -190,34 +191,34 @@ namespace factory {
     }
 
     template <class Ret>
-    Ret* get(json& j, WorldContext<WorldLogic, pt::Rectangle>& context) {
+    Ret* get(json& j, WorldUIO<WorldLogic, pt::Rectangle>& context) {
         return nullptr;
     }
 
     template <>
-    PUIO* get<PUIO>(json& j, WorldContext<WorldLogic, pt::Rectangle>& context) {
+    PUIO* get<PUIO>(json& j, WorldUIO<WorldLogic, pt::Rectangle>& context) {
         PUIO* puio = new PUIO(j["id"], *context.getWorld(), j["body_def"]);
         addFixture(j["shapes"], puio);
         return puio;
     }
     template <>
-    Ball* get<Ball>(json& j, WorldContext<WorldLogic, pt::Rectangle>& context) {
+    Ball* get<Ball>(json& j, WorldUIO<WorldLogic, pt::Rectangle>& context) {
         Ball* ball = new Ball(j["id"], *context.getWorld(), j["body_def"], j["properties"]);
         addFixture(j["shapes"], ball);
         return ball;
     }
 
     template <>
-    Windmill* get<Windmill>(json& j, WorldContext<WorldLogic, pt::Rectangle>& context) {
+    Windmill* get<Windmill>(json& j, WorldUIO<WorldLogic, pt::Rectangle>& context) {
         Windmill* windmill = new Windmill(j["id"], j["properties"]);
 
         for (auto& it: j["puios"]) {
             if(it["class"] == "puio") {
                 PUIO* puio1 = get<PUIO>(it, context);
-                if(puio1->id() == "blades") {
+                if(puio1->getID() == "blades") {
                     windmill->setBlades(puio1);
                 }
-                if(puio1->id() == "holder") {
+                if(puio1->getID() == "holder") {
                     windmill->setHolder(puio1);
                 }
             }
@@ -233,7 +234,7 @@ namespace factory {
         return windmill;
     }
 
-    void buildPUIO(json& j, WorldContext<WorldLogic, pt::Rectangle>& context) {
+    void buildPUIO(json& j, WorldUIO<WorldLogic, pt::Rectangle>& context) {
 
         if(j["class"] == "puio") {
             context.add(get<PUIO>(j, context));
@@ -251,7 +252,7 @@ namespace factory {
 
     }
 
-    void build(json& j, WorldContext<WorldLogic, pt::Rectangle>& context) {
+    void build(json& j, WorldUIO<WorldLogic, pt::Rectangle>& context) {
         for (auto& it: j["puios"]) {
             buildPUIO(it, context);
         }

@@ -14,7 +14,7 @@ public:
         if(signal.getUIOID() == "restart_bt" && signal.getState() == STATE::LEFT_BUTTON_CLICK) {
             AUIO* uio = context_->get("restart_bt");
             if(uio) {
-                IButton* button = dynamic_cast<IButton*>(context_->get("restart_bt"));
+//                IText* button = dynamic_cast<IText*>(context_->get("restart_bt"));
                 ContextManager::getInstance().setCurrentContext("menu_context");
 
             }

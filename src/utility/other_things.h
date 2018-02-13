@@ -9,10 +9,9 @@
 
 namespace other_things {
 
-#define DEGREES_TO_RADIANS 0.01745329251
-#define MY_PI 3.14159265359
+#define DEGREES_TO_RADIANS 0.01745329251f
+#define MY_PI 3.14159265359f
 #define SIN_TO_DEGREES(value) (asin(value)*180.0f/MY_PI)
-#define MY_PI_DIVIVDE_2 1.5707963268f
 
 #define NOW_YOU_ARE_SINGELTON(className) \
 private:\
@@ -114,27 +113,28 @@ return instance;}
     }
 
 
-    b2Vec2 calculateForce(const pt::point<int>& point, const pt::Circle<int>& shape, const float& speed) {
+    b2Vec2 calculateForce(const pt::point<int>& point1, const pt::point<int>& point2, const float& speed) {
 
-        pt::point<int> tmp_p = {point.x-shape.center.x, -(point.y-shape.center.y)};
+        pt::point<int> tmp_p = {point1.x-point2.x, -(point1.y-point2.y)};
         pt::point<int> tmp_p_a = {abs(tmp_p.x), abs(tmp_p.y)};
 
         auto g_s = [](int value) -> float { return value < 0 ? -1.0f : 1.0f; };
 
-        if(under(shape, point)) {
-            return {0.0f,0.0f};
-        } else {
-            float x_speed, y_speed;
+        float x_speed, y_speed;
 
-            float hypotenuse = sqrt((float)(tmp_p_a.x*tmp_p_a.x + tmp_p_a.y*tmp_p_a.y));
-            float sin_a = (float)tmp_p_a.y / hypotenuse;
-            float angle = SIN_TO_DEGREES(sin_a);
+        float hypotenuse = sqrt((float)(tmp_p_a.x*tmp_p_a.x + tmp_p_a.y*tmp_p_a.y));
+        float sin_a = (float)tmp_p_a.y / hypotenuse;
+        float angle = SIN_TO_DEGREES(sin_a);
 
-            y_speed = sin(angle*DEGREES_TO_RADIANS) * speed * g_s(tmp_p.y);
-            x_speed = sin((90-angle)*DEGREES_TO_RADIANS) * speed * g_s(tmp_p.x);
+        y_speed = sin(angle*DEGREES_TO_RADIANS) * speed * g_s(tmp_p.y);
+        x_speed = sin((90.0f-angle)*DEGREES_TO_RADIANS) * speed * g_s(tmp_p.x);
 
-            return {x_speed, y_speed};
-        }
+        return {x_speed, y_speed};
+    }
+
+
+    b2Vec2 calculateForce(const b2Vec2& point1, const b2Vec2& point2, const float& speed) {
+
     }
 }
 #endif //TESTC_OTHER_THINGS_H

@@ -3,29 +3,27 @@
 
 #include <ui/physics/WorldWrapper.h>
 #include <ui/physics/PO.h>
-#include "UIO.h"
-#include "../utility/other_things.h"
-#include "../utility/math_things.h"
+#include "ui/UIO.h"
+#include "utility/other_things.h"
+#include "utility/math_things.h"
 
 class PUIO : public AUIO, public box2d::PO {
     typedef int T;
     typedef pt::point<T> Point;
 public:
 
-    explicit PUIO(std::string&& id,
+    explicit PUIO(std::string id,
                    box2d::WorldWrapper& world,
                    b2BodyDef& bodyDef)
-            : AUIO(),
-              box2d::PO(world, bodyDef),
-              id_(id) {
+            : AUIO(std::move(id)),
+              box2d::PO(world, bodyDef) {
         setUserData(this);
     }
     explicit PUIO(std::string&& id,
                    box2d::WorldWrapper& world,
                    b2BodyDef&& bodyDef)
-            : AUIO(),
-              box2d::PO(world, bodyDef),
-              id_(id) {
+            : AUIO(std::move(id)),
+              box2d::PO(world, bodyDef) {
         setUserData(this);
     }
 
@@ -33,18 +31,8 @@ public:
             SDL_Log("Destructor PUIO: %s", id_.c_str());
     };
 
-
-    const std::string &id() const override {
-        return id_;
-    }
-
-    void setColorScheme(const ColorScheme &colorScheme) override {
-        colorScheme_ = colorScheme;
-    }
-
     void update() override {
         AUIO::update();
-
     }
 
     bool under(Point &&point) override {
@@ -125,25 +113,23 @@ public:
 
     }
 
-    void clickLeftButton(const Point &point) override {
-
+    void clickLeftButton(const Point& point) override {
+        notify(Signal{id_, STATE::LEFT_BUTTON_CLICK, point});
     }
 
-    void clickRightButton(const Point &point) override {
-
+    void clickRightButton(const Point& point) override {
+        notify(Signal{id_, STATE::RIGHT_BUTTON_CLICK, point});
     }
 
-    void enterKey(const char *key) override {
-
+    void enterKey(const char* key) override {
+        notify(Signal{id_, STATE::ENTER_KEY, key});
     }
 
-    void mouseMove(const Point &point) override {
-
+    void mouseMove(const Point& point) override {
+        notify(Signal{id_, STATE::MOUSE_MOVE, point});
     }
 
 private:
-    std::string id_;
-    ColorScheme colorScheme_ = theme::base::all.def;
 };
 
 #endif //TESTC_PUIO_H

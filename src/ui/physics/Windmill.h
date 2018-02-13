@@ -1,7 +1,7 @@
 #ifndef TESTC_WINDMILL_H
 #define TESTC_WINDMILL_H
 
-#include "PUIO.h"
+#include "ui/physics/PUIO.h"
 
 class Windmill : public AUIO {
     typedef std::unique_ptr<PUIO> puio_ptr;
@@ -13,12 +13,14 @@ public:
 
     };
 
-    explicit Windmill(std::string&& id, const properties& prop)
-            : AUIO(), id_(std::move(id)), properties_(prop)  {}
+    explicit Windmill(std::string id, const properties& prop)
+            : AUIO(std::move(id)), properties_(prop)  {
+    }
 
-    ~Windmill() = default;
+    ~Windmill() override = default;
 
     void setBlades(PUIO* puio) {
+        puio->body()->SetUserData(this);
         blades.reset(puio);
     }
     void setHolder(PUIO* puio) {
@@ -36,14 +38,6 @@ public:
         if(holder) {
             holder->update();
         }
-    }
-
-    const std::string &id() const override {
-        return id_;
-    }
-
-    void setColorScheme(const ColorScheme &colorScheme) override {
-        colorScheme_ = colorScheme;
     }
 
     bool under(Point &&point) override {
@@ -75,27 +69,25 @@ public:
 
     }
 
-    void clickLeftButton(const Point &point) override {
-
+    void clickLeftButton(const Point& point) override {
+        notify(Signal{id_, STATE::LEFT_BUTTON_CLICK, point});
     }
 
-    void clickRightButton(const Point &point) override {
-
+    void clickRightButton(const Point& point) override {
+        notify(Signal{id_, STATE::RIGHT_BUTTON_CLICK, point});
     }
 
-    void enterKey(const char *key) override {
-
+    void enterKey(const char* key) override {
+        notify(Signal{id_, STATE::ENTER_KEY, key});
     }
 
-    void mouseMove(const Point &point) override {
-
+    void mouseMove(const Point& point) override {
+        notify(Signal{id_, STATE::MOUSE_MOVE, point});
     }
 
 private:
     puio_ptr blades  {nullptr};
     puio_ptr holder  {nullptr};
-    std::string id_;
-    ColorScheme colorScheme_ = theme::base::all.def;
     properties properties_;
 };
 

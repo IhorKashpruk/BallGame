@@ -3,8 +3,8 @@
 
 #include <iostream>
 #include <ContextManager.h>
-#include <ui/Ball.h>
-#include <ui/physics/WorldContext.h>
+#include <ui/physics/Ball.h>
+#include <ui/physics/WorldUIO.h>
 #include "ALogic.h"
 #include "WorldLogic.h"
 
@@ -22,17 +22,19 @@ public:
         if(signal.getState() == STATE::LEFT_BUTTON_CLICK) {
             AUIO* auio = context_->get("world_context");
             if(auio) {
-                WorldContext<WorldLogic, pt::Rectangle>* worldContext =
-                        dynamic_cast<WorldContext<WorldLogic, pt::Rectangle> *>(auio);
+                WorldUIO<WorldLogic, pt::Rectangle>* worldContext =
+                        dynamic_cast<WorldUIO<WorldLogic, pt::Rectangle> *>(auio);
                 if (worldContext) {
                     AUIO* ball = worldContext->get("ball");
                     if(ball) {
                         Ball* b = dynamic_cast<Ball *>(ball);
-                        b->addVelocity(
-                                other_things::calculateForce(
-                                        std::any_cast<pt::point<int>>(signal.getValue()),
-                                        b->shape(), b->getSpeed())
-                        );
+                        pt::point<int> point = std::any_cast<pt::point<int>>(signal.getValue());
+                        if(!pt::under(b->shape(), point)) {
+                            b2Vec2 force = other_things::calculateForce(
+                                    point,
+                                    b->shape().center, b->getSpeed());
+                            b->addForce(force);
+                        }
                     }
                 }
             }

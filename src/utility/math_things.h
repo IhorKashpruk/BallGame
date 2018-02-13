@@ -2,7 +2,6 @@
 #define TESTC_MATH_THINGS_H
 
 #include <cmath>
-#include "primitive_types.h"
 
 
 namespace math_things {

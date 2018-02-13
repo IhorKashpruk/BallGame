@@ -11,13 +11,11 @@ class UIO : public AUIO {
     typedef int T;
     typedef pt::point<T> Point;
 public:
-    explicit UIO(std::string&& id, const Shape<T>& shape)
-            : AUIO(),
-              id_(std::move(id)),
+    explicit UIO(std::string id, const Shape<T>& shape)
+            : AUIO(std::move(id)),
               shape_(shape) {}
-    explicit UIO(std::string&& id, Shape<T>&& shape)
-            : AUIO(),
-              id_(std::move(id)),
+    explicit UIO(std::string id, Shape<T>&& shape)
+            : AUIO(std::move(id)),
               shape_(shape) {}
 
     virtual ~UIO() {
@@ -64,18 +62,8 @@ public:
         return shape_.angle;
     }
 
-    void setColorScheme(const ColorScheme& colorScheme) override {
-        colorScheme_ = colorScheme;
-    }
-
-    const std::string& id() const override {
-        return id_;
-    }
-
 protected:
-    std::string id_;
     Shape<T> shape_;
-    ColorScheme colorScheme_ = theme::base::all.def;
 };
 
 #endif //TESTC_UIO_H

@@ -5,6 +5,7 @@
 #include <memory>
 #include <theme_properties.h>
 #include <SDL2/SDL_log.h>
+#include <ui/interfaces/Identity.h>
 #include "AChecker.h"
 #include "interfaces/IDrawable.h"
 #include "AUIO.h"
@@ -17,7 +18,7 @@ class Context : public IDrawable, public AChecker {
     typedef int T;
     typedef pt::point<T> Point;
 public:
-    Context(std::string id) : AChecker(), id_(std::move(id)) {}
+    Context() : AChecker() {}
     virtual ~Context() {
         uios_.clear();
     }
@@ -32,7 +33,7 @@ public:
 
     AUIO* get(const std::string id) {
         for(auto& uio: uios_) {
-            if(uio->id() == id) {
+            if(uio->getID() == id) {
                 return &*uio;
             }
         }
@@ -47,7 +48,7 @@ public:
 
     Context& remove(const std::string& id) {
         uios_.erase(std::remove_if(uios_.begin(), uios_.end(), [&id, this](auto& uio) {
-            if(uio->id() == id) {
+            if(uio->getID() == id) {
                 if(uio.get() == this->selected_uio_) {
                     this->selected_uio_ = nullptr;
                 }
@@ -124,10 +125,6 @@ public:
         displayEvent(specEventType,{}, key);
     }
 
-    const std::string &getID() const {
-        return id_;
-    }
-
 private:
     AUIO* getUnder(const Point& point) {
         for (auto &it: uios_) {
@@ -159,7 +156,13 @@ protected:
     vec_uio_ptr uios_;
     logic_un_ptr logic_ {nullptr};
     AUIO* selected_uio_ = nullptr;
-    std::string id_;
+};
+
+class IdentityContext : public Context, public Identity {
+public:
+    explicit IdentityContext(std::string id) : Context(), Identity(std::move(id)) {}
+    virtual ~IdentityContext() = default;
+private:
 };
 
 

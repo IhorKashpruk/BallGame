@@ -1,27 +1,29 @@
 #ifndef TESTC_USERINTERFACEOBJECT_H
 #define TESTC_USERINTERFACEOBJECT_H
 
-#include "interfaces/IDrawable.h"
-#include "interfaces/IResponsible.h"
+#include <ui/interfaces/Identity.h>
+#include <ui/interfaces/Colorful.h>
+#include "ui/interfaces/IDrawable.h"
+#include "ui/interfaces/IResponsible.h"
 #include "logic/Subject.h"
-#include "interfaces/IDimensional.h"
-#include "ColorScheme.h"
+#include "ui/interfaces/IDimensional.h"
 
 class AUIO : public IDrawable,
              public IResponsible,
              public IDimensional,
-             public Subject {
+             public Subject,
+             public Identity,
+             public Colorful {
 public:
-    explicit AUIO()
+    explicit AUIO(std::string id)
             : IDrawable(),
               IResponsible(),
               IDimensional(),
-              Subject() {}
+              Subject(),
+              Identity(std::move(id)),
+              Colorful() {}
     virtual ~AUIO() = default;
-    virtual const std::string& id() const = 0;
-    virtual void setColorScheme(const ColorScheme& colorScheme) = 0;
     virtual void update() {}
-
 };
 
 #endif //TESTC_USERINTERFACEOBJECT_H

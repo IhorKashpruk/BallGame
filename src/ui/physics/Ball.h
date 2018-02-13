@@ -2,7 +2,7 @@
 #define TESTC_BALL_H
 
 #include <utility/primitive_types.h>
-#include "PUIO.h"
+#include "ui/physics/PUIO.h"
 
 class Ball : public PUIO {
 public:
@@ -14,13 +14,13 @@ public:
                   b2BodyDef& bodyDef,
                   const properties& prop) :
             PUIO(std::move(id), world, bodyDef),
-            properties_(prop){}
+            properties_(prop){ PUIO::body_->SetUserData(this); }
     explicit Ball(std::string&& id,
                   box2d::WorldWrapper& world,
                   b2BodyDef&& bodyDef,
                   properties&& prop) :
             PUIO(std::move(id), world, bodyDef),
-            properties_(prop) {}
+            properties_(prop) { PUIO::body_->SetUserData(this); }
     ~Ball() override = default;
 
     void addForce(b2Vec2 force) {
