@@ -12,7 +12,7 @@
 #include <utility/other_things.h>
 
 class Draftsman {
-NOW_YOU_ARE_SINGELTON(Draftsman)
+NOW_YOU_ARE_SINGLETON(Draftsman)
 public:
     bool init() {
         return initSDL() && createWindowAndRenderer();
@@ -158,7 +158,6 @@ public:
     SDL_Renderer* getRenderer() const { return renderer; }
     TTF_Font* getFont() const { return font; }
 
-private:
     ~Draftsman() {
         if(renderer)
             SDL_DestroyRenderer(renderer);
@@ -171,6 +170,8 @@ private:
             TTF_Quit();
         SDL_Quit();
     }
+
+private:
     bool createWindowAndRenderer() {
         window = SDL_CreateWindow(
                 window::title,

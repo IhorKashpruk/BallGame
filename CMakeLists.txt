@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.7)
 project(testC__)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "-O3 -Wall -pedantic -Wno-unused -Wextra")
+#set(CMAKE_CXX_FLAGS "-O3 -Wall -pedantic -Wno-unused -Wextra")
+set(CMAKE_CXX_FLAGS)
 
 file(GLOB Box2D_Code
         "src/libs/Box2D/Collision/*"
@@ -53,7 +54,14 @@ set(SOURCE_FILES main.cpp
         src/ui/logic/WorldLogic.h
         src/ui/physics/Ball.h
         src/ui/logic/AfterGameLogic.h
-        src/JsonReader.h src/LevelManager.h src/ui/physics/Windmill.h src/ui/interfaces/Identity.h src/ui/interfaces/Colorful.h src/ui/Label.h src/ui/interfaces/IText.h src/ui/physics/Influential.h)
+        src/JsonReader.h
+        src/LevelManager.h
+        src/ui/physics/Windmill.h
+        src/ui/interfaces/Identity.h
+        src/ui/interfaces/Colorful.h
+        src/ui/Label.h
+        src/ui/interfaces/IText.h
+        src/ui/physics/Influential.h src/ui/physics/InfluentialPUIO.h src/ui/physics/ContactListener.h)
 
 include_directories(src)
 include_directories(src/libs)

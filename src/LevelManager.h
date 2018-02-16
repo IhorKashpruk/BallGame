@@ -20,26 +20,26 @@ namespace level {
     constexpr const size_t count_of_levels = size(levels);
 
     class LevelManager {
-    NOW_YOU_ARE_SINGELTON(LevelManager)
+    NOW_YOU_ARE_SINGLETON(LevelManager)
     public:
 
         void buildNextLevel() {
-            if((int)count_of_levels > (currentLevel+1)) {
-                if(JsonReader::exists(levels[currentLevel+1])) {
+            if((int)count_of_levels > (currentLevel_+1)) {
+                if(JsonReader::exists(levels[currentLevel_+1])) {
                     WorldUIO<WorldLogic, pt::Rectangle>* worldContext
                             = dynamic_cast<WorldUIO<WorldLogic, pt::Rectangle> *>
                             (ContextManager::getInstance().get("game_context")->get("world_context"));
                     worldContext->removeAll();
                     worldContext->resetWorld(new box2d::WorldWrapper());
-                    json j = JsonReader::get(levels[currentLevel+1]);
+                    json j = JsonReader::get(levels[currentLevel_+1]);
                     factory::build(j, *worldContext);
                 }
             }
-            currentLevel++;
+            currentLevel_++;
         }
 
     private:
-        int currentLevel {-1};
+        int currentLevel_ {-1};
     };
 
 }

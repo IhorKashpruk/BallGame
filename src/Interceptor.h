@@ -9,7 +9,7 @@
 #include "ContextManager.h"
 
 class Interceptor {
-    NOW_YOU_ARE_SINGELTON(Interceptor)
+NOW_YOU_ARE_SINGLETON(Interceptor)
 public:
     inline bool interceptWithAction() {
         static SDL_Event event;
@@ -71,9 +71,9 @@ public:
     }
     void run(std::atomic<bool>& isGameDone) {
         stop();
-        std_thread_ = std::move(std::thread(&Interceptor::runnable, this, std::ref(isGameDone)));
+        thread_ = std::move(std::thread(&Interceptor::runnable, this, std::ref(isGameDone)));
         isDone_ = false;
-        std_thread_.detach();
+        thread_.detach();
     }
 
     void stop() {
@@ -93,7 +93,7 @@ private:
 //            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     }
-    std::thread std_thread_;
+    std::thread thread_;
     std::atomic<bool> isDone_{true};
 };
 

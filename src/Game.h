@@ -6,7 +6,7 @@
 #include "Draftsman.h"
 
 class Game {
-    NOW_YOU_ARE_SINGELTON(Game)
+NOW_YOU_ARE_SINGLETON(Game)
 public:
     bool setUp() {
         if(!Draftsman::getInstance().init()) {

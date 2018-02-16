@@ -5,7 +5,7 @@
 #include "ui/Context.h"
 
 class ContextManager {
-    NOW_YOU_ARE_SINGELTON(ContextManager)
+    NOW_YOU_ARE_SINGLETON(ContextManager)
     typedef std::shared_ptr<IdentityContext>    context_ptr;
     typedef std::weak_ptr<IdentityContext>      weak_context_ptr;
     typedef std::vector<context_ptr>            vector_context_ptr;
