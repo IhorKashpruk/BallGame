@@ -5,8 +5,7 @@
 
 class IInfluential {
 public:
-    virtual IInfluential() = default;
-
+    virtual ~IInfluential() {}
     virtual void add(PUIO* puio) = 0;
     virtual void remove(PUIO* puio) = 0;
     virtual bool has(PUIO* puio) = 0;
@@ -16,9 +15,10 @@ public:
 
 class AInfluential : public IInfluential {
 public:
-    explicit AInfluential() : IInfluential() {}
-    virtual ~AInfluential() = default;
-    void add(PUIO *puio) override {
+    AInfluential() {}
+    virtual ~AInfluential() {};
+
+    void add(PUIO* puio) override {
         if(puio) { puios_.push_back(puio); }
     }
 
@@ -33,7 +33,6 @@ public:
     void setOwner(PUIO* owner) {
         if(owner) { owner_ = owner;}
     }
-
 protected:
     std::vector<PUIO*> puios_ {};
     PUIO* owner_ { nullptr };
@@ -45,21 +44,21 @@ public:
     struct properties {
         float force;
     };
-    explicit Attractive(const properties& prop) : AInfluential(),  properties_(prop) {}
-    explicit Attractive(properties&& prop) :  AInfluential(), properties_(std::move(prop)) {}
+    Attractive(const properties& prop) : AInfluential(),  properties_(prop) {}
+    Attractive(properties&& prop) :  AInfluential(), properties_(std::move(prop)) {}
+    virtual ~Attractive() {};
 
     void update() override {
     }
 
     void work() override {
         if(!owner_) { return; }
-        for(auto& puio: puios_) {
-            puio->body()->ApplyForceToCenter(
-                    other_things::calculateForce(
-                            owner_->body()->GetPosition(),
-                            puio->body()->GetPosition(),
-                            properties_.force),
-                    true);
+        for(auto puio: puios_) {
+            b2Vec2 force = other_things::calculateForce(
+                    puio->body()->GetPosition(),
+                    owner_->body()->GetPosition(),
+                    properties_.force);
+            puio->body()->ApplyForceToCenter(force, true);
         }
     }
 

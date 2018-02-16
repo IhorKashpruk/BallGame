@@ -7,6 +7,11 @@
 #include "utility/other_things.h"
 #include "utility/math_things.h"
 
+enum class EntityCategory {
+    NORMAL = 0x0001,
+    TRANSPARENT = 0x0002
+};
+
 class PUIO : public AUIO, public box2d::PO {
     typedef int T;
     typedef pt::point<T> Point;
@@ -28,7 +33,7 @@ public:
     }
 
     virtual ~PUIO() {
-            SDL_Log("Destructor PUIO: %s", id_.c_str());
+        SDL_Log("Destructor PUIO: %s", id_.c_str());
     };
 
     void update() override {

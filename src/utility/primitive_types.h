@@ -61,7 +61,7 @@ namespace pt {
         Polygon(typename Shape<T>::Point center, float angle, std::vector<typename Shape<T>::Point>&& points)
                 : Shape<T>(center, angle), points{std::move(points)} {}
         Polygon() = default;
-        std::vector<typename Shape<T>::Point> points;
+        std::vector<typename Shape<T>::Point> points {};
     };
 
     template <class T>

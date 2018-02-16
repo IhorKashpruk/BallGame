@@ -8,6 +8,8 @@
 #include <ui/logic/WorldLogic.h>
 #include <ui/physics/Ball.h>
 #include <ui/physics/Windmill.h>
+#include <ui/physics/InfluentialPUIO.h>
+#include <ui/physics/Influential.h>
 
 using json = nlohmann::json;
 
@@ -135,6 +137,9 @@ void from_json(const json& j, b2FixtureDef& fixtureDef) {
     fixtureDef.density = j.at("density").get<float>();
     fixtureDef.restitution = j.at("restitution").get<float>();
     fixtureDef.friction = j.at("friction").get<float>();
+    fixtureDef.filter.categoryBits = j.at("categoryBits").get<uint16>();
+    fixtureDef.filter.maskBits = j.at("maskBits").get<uint16>();
+    fixtureDef.isSensor = j.at("isSensor").get<bool>();
 }
 
 void to_json(json& j, const b2RevoluteJointDef& fixtureDef) {
@@ -164,6 +169,14 @@ void to_json(json& j, const Windmill::properties& properties) {
 }
 
 void from_json(const json& j, Windmill::properties& properties) {
+}
+
+void to_json(json& j, const Attractive::properties& properties) {
+    j = json{};
+}
+
+void from_json(const json& j, Attractive::properties& properties) {
+    properties.force = j["force"].get<float>();
 }
 
 
@@ -209,6 +222,13 @@ namespace factory {
     }
 
     template <>
+    InfluentialPUIO<Attractive>* get<InfluentialPUIO<Attractive>>(json& j, WorldUIO<WorldLogic, pt::Rectangle>& context) {
+        InfluentialPUIO<Attractive>* influentialPUIO = new InfluentialPUIO<Attractive>(j["id"], *context.getWorld(), j["body_def"], j["properties"]);
+        addFixture(j["shapes"], influentialPUIO);
+        return influentialPUIO;
+    }
+
+    template <>
     Windmill* get<Windmill>(json& j, WorldUIO<WorldLogic, pt::Rectangle>& context) {
         Windmill* windmill = new Windmill(j["id"], j["properties"]);
 
@@ -249,7 +269,9 @@ namespace factory {
             context.add(get<Windmill>(j, context));
             return;
         }
-
+        if(j["class"] == "influentialpuio<attractive>") {
+            context.add(get<InfluentialPUIO<Attractive>>(j, context));
+        }
     }
 
     void build(json& j, WorldUIO<WorldLogic, pt::Rectangle>& context) {
@@ -257,7 +279,6 @@ namespace factory {
             buildPUIO(it, context);
         }
     }
-
 }
 
 #endif //TESTC_FACTORY_H

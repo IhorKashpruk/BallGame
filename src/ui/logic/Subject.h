@@ -16,8 +16,9 @@ public:
     void detachAll() { observers_.clear(); }
     virtual ~Subject() = default;
 
-protected:
+private:
     std::vector<IObserver*>  observers_{};
+protected:
     void notify(Signal&& value) {
         for(auto& it: observers_) {
             it->update(value);

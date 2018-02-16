@@ -27,6 +27,5 @@ namespace math_things {
     inline T normalize(T value) {
         return (std::round(value));
     }
-
 }
 #endif //TESTC_MATH_THINGS_H

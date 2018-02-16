@@ -22,6 +22,7 @@ public:
               Subject(),
               Identity(std::move(id)),
               Colorful() {}
+
     virtual ~AUIO() = default;
     virtual void update() {}
 };

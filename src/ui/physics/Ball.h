@@ -3,24 +3,34 @@
 
 #include <utility/primitive_types.h>
 #include "ui/physics/PUIO.h"
+#include <atomic>
+
 
 class Ball : public PUIO {
 public:
     struct properties {
         float speed;
     };
+    enum class DIRECTION {
+        UP,
+        DOWN,
+        LEFT,
+        RIGHT,
+        STOP,
+        NONE
+    };
     explicit Ball(std::string&& id,
                   box2d::WorldWrapper& world,
                   b2BodyDef& bodyDef,
                   const properties& prop) :
             PUIO(std::move(id), world, bodyDef),
-            properties_(prop){ PUIO::body_->SetUserData(this); }
+            properties_(prop){ PUIO::setUserData(this); }
     explicit Ball(std::string&& id,
                   box2d::WorldWrapper& world,
                   b2BodyDef&& bodyDef,
                   properties&& prop) :
             PUIO(std::move(id), world, bodyDef),
-            properties_(prop) { PUIO::body_->SetUserData(this); }
+            properties_(prop) { PUIO::setUserData(this); }
     ~Ball() override = default;
 
     void addForce(b2Vec2 force) {
@@ -51,8 +61,36 @@ public:
         properties_.speed = speed;
     }
 
+    void update() override {
+        PUIO::update();
+        switch (direction_.load()) {
+            case DIRECTION::UP:
+                addForce(b2Vec2{0.0f, properties_.speed});
+                break;
+            case DIRECTION::DOWN:
+                addForce(b2Vec2{0.0f, -properties_.speed});
+                break;
+            case DIRECTION::LEFT:
+                addForce(b2Vec2{-properties_.speed, 0.0f});
+                break;
+            case DIRECTION::RIGHT:
+                addForce(b2Vec2{properties_.speed, 0.0f});
+                break;
+            case DIRECTION::STOP:
+                addForce(b2Vec2{0.0f, 0.0f});
+                break;
+            case DIRECTION::NONE:
+                break;
+        };
+        direction_ = DIRECTION::NONE;
+    }
+
+    void setDirection(DIRECTION direction) { direction_ = direction; }
+    DIRECTION getDirection() { return direction_; }
+
 private:
     properties properties_;
+    std::atomic<DIRECTION> direction_ {DIRECTION::NONE};
 };
 
 

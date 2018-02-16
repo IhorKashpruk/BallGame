@@ -15,9 +15,19 @@ public:
     void update(Signal signal) override {
 
         if(signal.getState() == STATE::ENTER_KEY) {
-            if(strcmp(std::any_cast<const char*>(signal.getValue()),"Escape") == 0) {
+            const char* key = std::any_cast<const char*>(signal.getValue());
+            if(strcmp(key,"Escape") == 0) {
                 ContextManager::getInstance().setCurrentContext("menu_context");
             }
+            if(isNecessaryKey(key)) {
+                AUIO *auio = context_->get("world_context");
+                WorldUIO<WorldLogic, pt::Rectangle> *worldContext =
+                        dynamic_cast<WorldUIO<WorldLogic, pt::Rectangle> *>(auio);
+                AUIO *ball = worldContext->get("ball");
+                Ball *b = dynamic_cast<Ball *>(ball);
+                b->setDirection(direction(key));
+            }
+
         }
         if(signal.getState() == STATE::LEFT_BUTTON_CLICK) {
             AUIO* auio = context_->get("world_context");
@@ -29,16 +39,33 @@ public:
                     if(ball) {
                         Ball* b = dynamic_cast<Ball *>(ball);
                         pt::point<int> point = std::any_cast<pt::point<int>>(signal.getValue());
+                        b2Vec2 point1 = other_things::toPoint(point);
                         if(!pt::under(b->shape(), point)) {
                             b2Vec2 force = other_things::calculateForce(
-                                    point,
-                                    b->shape().center, b->getSpeed());
+                                    b->body()->GetPosition(),
+                                    point1, b->getSpeed());
                             b->addForce(force);
                         }
                     }
                 }
             }
         }
+    }
+
+private:
+    bool isNecessaryKey(const char* key) {
+        return !strcmp(key,"Up")
+               || !strcmp(key,"Down")
+               || !strcmp(key,"Left")
+               || !strcmp(key,"Right")
+               || !strcmp(key,"Space");
+    }
+    typename Ball::DIRECTION direction(const char* key) {
+        if(!strcmp(key,"Up")) { return Ball::DIRECTION::UP; }
+        if(!strcmp(key,"Down")) { return Ball::DIRECTION::DOWN; }
+        if(!strcmp(key,"Left")) { return Ball::DIRECTION::LEFT; }
+        if(!strcmp(key,"Right")) { return Ball::DIRECTION::RIGHT; }
+        if(!strcmp(key,"Space")) { return Ball::DIRECTION::NONE; }
     }
 };
 

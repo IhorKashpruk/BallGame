@@ -5,6 +5,7 @@
 #include <ui/UIO.h>
 #include <Draftsman.h>
 #include "WorldWrapper.h"
+#include "ContactListener.h"
 
 template <class Logic, template <class> class Shape>
 class WorldUIO : public ModernContext<Logic>, public UIO<Shape> {
@@ -50,6 +51,7 @@ public:
 
     void resetWorld(box2d::WorldWrapper* world) {
         world_.reset(world);
+        world_->getWorld()->SetContactListener(new box2d::ContactListener());
     }
 
 private:
