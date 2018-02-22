@@ -2,60 +2,66 @@
 #define MYGAME_CHECKER_H
 
 #include "../utility/primitive_types.h"
+#include "../EventManager.h"
 
-enum class SpecEventType {
-    CLICK_LEFT_BUTTON   = 0,
-    CLICK_RIGHT_BUTTON  = 1,
-    ENTER_KEY           = 2,
-    MOUSE_MOVE          = 3,
-    NONE                = 4
+enum class CONTEXT_EVENT_ {
+    L_B_D__L_B_U    = 5,
+    R_B_D__R_B_U    = 10,
+    M_M__M_M        = 16,
+    K_D__K_U        = 96,
+    K_D__K_D        = 32,
+    K_D__M_M        = 48,
+    NONE__K_D       = 160,
+    NONE            = 128
 };
 
-enum class EventType {
-    LEFT_BUTTON_DOWN    = 0,
-    RIGHT_BUTTON_DOWN   = 1,
-    LEFT_BUTTON_UP      = 2,
-    RIGHT_BUTTON_UP     = 3,
-    MOUSE_MOVE          = 4,
-    KEY_DOWN            = 5,
-    KEY_UP              = 6,
-    NONE                = 7
+enum class CONTEXT_EVENT {
+    CLICK_LEFT_BUTTON   = 5,
+    CLICK_RIGHT_BUTTON  = 10,
+    MOUSE_MOVE          = 16,
+    ENTER_KEY           = 96,
+    NONE                = 128
 };
 
-struct Event {
-    EventType previous_ = EventType::NONE;
-    SpecEventType add(const EventType t) {
-        if(previous_ == EventType::NONE) {
-            previous_ = t;
-            return SpecEventType::NONE;
+struct EventSimplifier {
+    EVENT previous_ = EVENT::NONE;
+    CONTEXT_EVENT add(const EVENT t) {
+//        if(previous_ == EVENT::NONE) {
+//            previous_ = t;
+//            return CONTEXT_EVENT::NONE;
+//        }
+        if(t == EVENT::KEY_DOWN) {
+            return CONTEXT_EVENT::ENTER_KEY;
         }
-        switch(t) {
-            case EventType::LEFT_BUTTON_DOWN:
-                break;
-            case EventType::RIGHT_BUTTON_DOWN:
-                break;
-            case EventType::LEFT_BUTTON_UP:
-                if(previous_ == EventType::LEFT_BUTTON_DOWN)
-                    return SpecEventType::CLICK_LEFT_BUTTON;
-                break;
-            case EventType::RIGHT_BUTTON_UP:
-                if(previous_ == EventType::RIGHT_BUTTON_DOWN)
-                    return SpecEventType::CLICK_RIGHT_BUTTON;
-                break;
-            case EventType::MOUSE_MOVE:
-                return SpecEventType ::MOUSE_MOVE;
-                break;
-            case EventType::KEY_DOWN:
-                return SpecEventType::ENTER_KEY;
-                break;
-            case EventType::KEY_UP:break;
-            case EventType::NONE:break;
+        switch((int)previous_ | (int)t) {
+            case (int)CONTEXT_EVENT_::L_B_D__L_B_U:
+                clear();
+                return CONTEXT_EVENT::CLICK_LEFT_BUTTON;
+            case (int)CONTEXT_EVENT_::R_B_D__R_B_U:
+                clear();
+                return CONTEXT_EVENT::CLICK_RIGHT_BUTTON;
+            case (int)CONTEXT_EVENT_::M_M__M_M:
+                clear();
+                return CONTEXT_EVENT::MOUSE_MOVE;
+            case (int)CONTEXT_EVENT_::K_D__K_U:
+                clear();
+                return CONTEXT_EVENT::ENTER_KEY;
+            case (int)CONTEXT_EVENT_::K_D__K_D:
+                clear();
+                return CONTEXT_EVENT::ENTER_KEY;
+            case (int)CONTEXT_EVENT_::K_D__M_M:
+                clear();
+                return CONTEXT_EVENT::ENTER_KEY;
+            case (int)CONTEXT_EVENT_::NONE__K_D:
+                clear();
+                return CONTEXT_EVENT::ENTER_KEY;
+            default:
+                previous_ = t;
+                return CONTEXT_EVENT::NONE;
         }
-        previous_ = t;
-        return SpecEventType::NONE;
-    }
+     }
     void clear() {
-        previous_ = EventType::NONE;
+        previous_ = EVENT::NONE;
     }
 };
 
@@ -67,11 +73,11 @@ public:
     virtual ~AChecker() = default;
 
 protected:
-    virtual void check(const EventType& event, const Point& point) = 0;
-    virtual void check(const EventType& event, const char* key) = 0;
-    Event& getPreviousEvent() { return previousEvent_; }
+    virtual void check(const EVENT& event, const Point& point) = 0;
+    virtual void check(const EVENT& event, const char* key) = 0;
+    EventSimplifier& getPreviousEvent() { return previousEvent_; }
 private:
-    Event previousEvent_;
+    EventSimplifier previousEvent_;
 };
 
 

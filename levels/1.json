@@ -1,58 +1,741 @@
 {
-  "ball": {
-    "class": "Ball",
-    "shape": {
-      "center": {
-        "x": 2.0,
-        "y": 2.0
+  "puios": [
+    {
+      "class": "puio",
+      "id": "d",
+      "category": 3,
+      "body_def": {
+        "type": 2,
+        "position": {
+          "x": 4,
+          "y": -4
+        },
+        "angle": 2,
+        "bullet": false,
+        "fixedRotation": false
       },
-      "angle": 0.0,
-      "radius": 0.5
+      "shapes": [
+        {
+          "fixture_def": {
+            "density": 0.5,
+            "restitution": 0.2,
+            "friction": 0.1,
+            "categoryBits": 1,
+            "maskBits": 1,
+            "isSensor": false
+          },
+          "shapes": [
+            {
+              "type": "circle",
+              "m_position": {
+                "x": 0,
+                "y": 0
+              },
+              "m_radius": 1
+            },
+            {
+              "type": "circle",
+              "m_position": {
+                "x": 0.5,
+                "y": 0.5
+              },
+              "m_radius": 1
+            }
+          ]
+        }
+      ]
     },
-    "properties": {
-      "density": 1.0,
-      "restitution": 0.1,
-      "body_type": 2
-    }
-  },
-  "puio1": {
-    "class": "PUIO",
-    "shape": {
-      "type": "rectangle",
-      "center": {
-        "x": 2.0,
-        "y": 2.0
+    {
+      "class": "ball",
+      "id": "ball",
+      "category": 1,
+      "properties": {
+        "speed": 4
       },
-      "angle": 0.0,
-      "size": {
-        "w": 2.0,
-        "h": 0.25
-      }
-    },
-    "properties": {
-      "density": 1.0,
-      "restitution": 0.1,
-      "body_type": 2
-    }
-  },
-  "puio2": {
-    "class": "PUIO",
-    "shape": {
-      "type": "rectangle",
-      "center": {
-        "x": 2.0,
-        "y": 2.0
+      "body_def": {
+        "type": 2,
+        "position": {
+          "x": 5,
+          "y": -9
+        },
+        "angle": 0.5,
+        "bullet": true,
+        "fixedRotation": true
       },
-      "angle": 0.0,
-      "size": {
-        "w": 2.0,
-        "h": 0.25
-      }
+      "shapes": [
+        {
+          "fixture_def": {
+            "density": 2.5,
+            "restitution": 0.2,
+            "friction": 0.9,
+            "categoryBits": 1,
+            "maskBits": 1,
+            "isSensor": false
+          },
+          "shapes": [
+            {
+              "type": "circle",
+              "m_position": {
+                "x": 0,
+                "y": 0
+              },
+              "m_radius": 0.3
+            }
+          ]
+        }
+      ]
     },
-    "properties": {
-      "density": 1.0,
-      "restitution": 0.1,
-      "body_type": 2
+    {
+      "class": "puio",
+      "id": "top_wall",
+      "category": 4,      
+      "body_def": {
+        "type": 0,
+        "position": {
+          "x": 6,
+          "y": -0.1
+        },
+        "angle": 0,
+        "bullet": false,
+        "fixedRotation": false
+      },
+      "shapes": [
+        {
+          "fixture_def": {
+            "density": 5,
+            "restitution": 0.2,
+            "friction": 0.9,
+            "categoryBits": 1,
+            "maskBits": 1,
+            "isSensor": false
+          },
+          "shapes": [
+            {
+              "type": "polygon",
+              "m_position": {
+                "x": 0,
+                "y": 0
+              },
+              "m_center": {
+                "x": 0,
+                "y": 0
+              },
+              "angle": 0,
+              "points": [
+                {
+                  "x": 6,
+                  "y": 0.1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "class": "puio",
+      "id": "down_wall",
+      "category": 2,
+      "body_def": {
+        "type": 0,
+        "position": {
+          "x": 6,
+          "y": -11.9
+        },
+        "angle": 0,
+        "bullet": false,
+        "fixedRotation": false
+      },
+      "shapes": [
+        {
+          "fixture_def": {
+            "density": 5,
+            "restitution": 0.2,
+            "friction": 0.9,
+            "categoryBits": 1,
+            "maskBits": 1,
+            "isSensor": false
+          },
+          "shapes": [
+            {
+              "type": "polygon",
+              "m_position": {
+                "x": 0,
+                "y": 0
+              },
+              "m_center": {
+                "x": 0,
+                "y": 0
+              },
+              "angle": 0,
+              "points": [
+                {
+                  "x": 6,
+                  "y": 0.1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "class": "puio",
+      "id": "left_wall",
+      "category": 4,
+      "body_def": {
+        "type": 0,
+        "position": {
+          "x": 0.1,
+          "y": -6
+        },
+        "angle": 0,
+        "bullet": false,
+        "fixedRotation": false
+      },
+      "shapes": [
+        {
+          "fixture_def": {
+            "density": 5,
+            "restitution": 0.2,
+            "friction": 0.1,
+            "categoryBits": 1,
+            "maskBits": 1,
+            "isSensor": false
+          },
+          "shapes": [
+            {
+              "type": "polygon",
+              "m_position": {
+                "x": 0,
+                "y": 0
+              },
+              "m_center": {
+                "x": 0,
+                "y": 0
+              },
+              "angle": 0,
+              "points": [
+                {
+                  "x": 0.1,
+                  "y": 6
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "class": "puio",
+      "id": "right_wall",
+      "category": 4,
+      "body_def": {
+        "type": 0,
+        "position": {
+          "x": 11.9,
+          "y": -6
+        },
+        "angle": 0,
+        "bullet": false,
+        "fixedRotation": false
+      },
+      "shapes": [
+        {
+          "fixture_def": {
+            "density": 5,
+            "restitution": 0.2,
+            "friction": 0.1,
+            "categoryBits": 1,
+            "maskBits": 1,
+            "isSensor": false
+          },
+          "shapes": [
+            {
+              "type": "polygon",
+              "m_position": {
+                "x": 0,
+                "y": 0
+              },
+              "m_center": {
+                "x": 0,
+                "y": 0
+              },
+              "angle": 0,
+              "points": [
+                {
+                  "x": 0.1,
+                  "y": 6
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "class": "puio",
+      "id": "wall",
+      "category": 4,
+      "body_def": {
+        "type": 2,
+        "position": {
+          "x": 6.1,
+          "y": -6
+        },
+        "angle": 0,
+        "bullet": false,
+        "fixedRotation": false
+      },
+      "shapes": [
+        {
+          "fixture_def": {
+            "density": 5,
+            "restitution": 0.2,
+            "friction": 0.1,
+            "categoryBits": 1,
+            "maskBits": 1,
+            "isSensor": false
+          },
+          "shapes": [
+            {
+              "type": "polygon",
+              "m_position": {
+                "x": 0,
+                "y": 0
+              },
+              "m_center": {
+                "x": 0,
+                "y": 0
+              },
+              "angle": 0,
+              "points": [
+                {
+                  "x": 0.1,
+                  "y": 0.8
+                }
+              ]
+            },
+            {
+              "type": "polygon",
+              "m_position": {
+                "x": 0,
+                "y": 0
+              },
+              "m_center": {
+                "x": 0,
+                "y": 0
+              },
+              "angle": 0,
+              "points": [
+                {
+                  "x": -0.8,
+                  "y": 0.1
+                },
+                {
+                  "x": 0.8,
+                  "y": 0.1
+                },
+                {
+                  "x": 0.8,
+                  "y": -0.1
+                },
+                {
+                  "x": -0.8,
+                  "y": -0.1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "class": "windmill",
+      "id": "windmill2",
+      "properties": {},
+      "puios": [
+        {
+          "class": "puio",
+          "id": "blades",
+          "category": 3,
+          "body_def": {
+            "type": 2,
+            "position": {
+              "x": 3,
+              "y": -3
+            },
+            "angle": 0,
+            "bullet": false,
+            "fixedRotation": false
+          },
+          "shapes": [
+            {
+              "fixture_def": {
+                "density": 5,
+                "restitution": 0.2,
+                "friction": 0.1,
+                "categoryBits": 1,
+                "maskBits": 1,
+                "isSensor": false
+              },
+              "shapes": [
+                {
+                  "type": "polygon",
+                  "m_position": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "m_center": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "angle": 0,
+                  "points": [
+                    {
+                      "x": 0.1,
+                      "y": 0.8
+                    }
+                  ]
+                },
+                {
+                  "type": "polygon",
+                  "m_position": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "m_center": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "angle": 0,
+                  "points": [
+                    {
+                      "x": -0.8,
+                      "y": 0.1
+                    },
+                    {
+                      "x": 0.8,
+                      "y": 0.1
+                    },
+                    {
+                      "x": 0.8,
+                      "y": -0.1
+                    },
+                    {
+                      "x": -0.8,
+                      "y": -0.1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "class": "puio",
+          "id": "holder",
+          "category": 3,
+          "body_def": {
+            "type": 0,
+            "position": {
+              "x": 3,
+              "y": -3
+            },
+            "angle": 0,
+            "bullet": false,
+            "fixedRotation": false
+          },
+          "shapes": [
+            {
+              "fixture_def": {
+                "density": 5,
+                "restitution": 0.2,
+                "friction": 0.1,
+                "categoryBits": 1,
+                "maskBits": 1,
+                "isSensor": false
+              },
+              "shapes": [
+                {
+                  "type": "circle",
+                  "m_position": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "m_radius": 0.1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "type": "revolute",
+          "bodyA": "blades",
+          "bodyB": "holder",
+          "collideConnected": false,
+          "localAnchorA": {
+            "x": 0,
+            "y": 0
+          },
+          "localAnchorB": {
+            "x": 0,
+            "y": 0
+          },
+          "enableMotor": true,
+          "maxMotorTorque": 20,
+          "motorSpeed": 1.5707963268
+        }
+      ]
+    },
+    {
+      "class": "windmill",
+      "id": "windmill",
+      "properties": {},
+      "puios": [
+        {
+          "class": "puio",
+          "id": "blades",
+          "category": 3,
+          "body_def": {
+            "type": 2,
+            "position": {
+              "x": 8,
+              "y": -8
+            },
+            "angle": 0,
+            "bullet": false,
+            "fixedRotation": false
+          },
+          "shapes": [
+            {
+              "fixture_def": {
+                "density": 5,
+                "restitution": 0.2,
+                "friction": 0.1,
+                "categoryBits": 1,
+                "maskBits": 1,
+                "isSensor": false
+              },
+              "shapes": [
+                {
+                  "type": "polygon",
+                  "m_position": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "m_center": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "angle": 0,
+                  "points": [
+                    {
+                      "x": 0.1,
+                      "y": 0.8
+                    }
+                  ]
+                },
+                {
+                  "type": "polygon",
+                  "m_position": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "m_center": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "angle": 0,
+                  "points": [
+                    {
+                      "x": -0.8,
+                      "y": 0.1
+                    },
+                    {
+                      "x": 0.8,
+                      "y": 0.1
+                    },
+                    {
+                      "x": 0.8,
+                      "y": -0.1
+                    },
+                    {
+                      "x": -0.8,
+                      "y": -0.1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "class": "puio",
+          "id": "holder",
+          "category": 3,
+          "body_def": {
+            "type": 0,
+            "position": {
+              "x": 8,
+              "y": -8
+            },
+            "angle": 0,
+            "bullet": false,
+            "fixedRotation": false
+          },
+          "shapes": [
+            {
+              "fixture_def": {
+                "density": 5,
+                "restitution": 0.2,
+                "friction": 0.1,
+                "categoryBits": 1,
+                "maskBits": 1,
+                "isSensor": false
+              },
+              "shapes": [
+                {
+                  "type": "circle",
+                  "m_position": {
+                    "x": 0,
+                    "y": 0
+                  },
+                  "m_radius": 0.1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "joints": [
+        {
+          "type": "revolute",
+          "bodyA": "blades",
+          "bodyB": "holder",
+          "collideConnected": false,
+          "localAnchorA": {
+            "x": 0,
+            "y": 0
+          },
+          "localAnchorB": {
+            "x": 0,
+            "y": 0
+          },
+          "enableMotor": true,
+          "maxMotorTorque": 20,
+          "motorSpeed": -1.5707963268
+        }
+      ]
+    },
+    {
+      "class": "puio",
+      "id": "floor1",
+      "category": 2,
+      "body_def": {
+        "type": 0,
+        "position": {
+          "x": 3,
+          "y": -8
+        },
+        "angle": 0,
+        "bullet": false,
+        "fixedRotation": false
+      },
+      "shapes": [
+        {
+          "fixture_def": {
+            "density": 5,
+            "restitution": 0.2,
+            "friction": 0.1,
+            "categoryBits": 1,
+            "maskBits": 1,
+            "isSensor": false
+          },
+          "shapes": [
+            {
+              "type": "polygon",
+              "m_position": {
+                "x": 0,
+                "y": 0
+              },
+              "m_center": {
+                "x": 0,
+                "y": 0
+              },
+              "angle": 0,
+              "points": [
+                {
+                  "x": 3,
+                  "y": 0.1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "class": "influentialpuio<attractive>",
+      "id": "influential",
+      "category": 3,
+      "properties": {
+        "force": 9.8
+      },
+      "body_def": {
+        "type": 0,
+        "position": {
+          "x": 8,
+          "y": -9
+        },
+        "angle": 0,
+        "bullet": false,
+        "fixedRotation": false
+      },
+      "shapes": [
+        {
+          "fixture_def": {
+            "density": 0.5,
+            "restitution": 0.2,
+            "friction": 0.1,
+            "categoryBits": 1,
+            "maskBits": 1,
+            "isSensor": false
+          },
+          "shapes": [
+            {
+              "type": "circle",
+              "m_position": {
+                "x": 0,
+                "y": 0
+              },
+              "m_radius": 0.1
+            }
+          ]
+        },
+        {
+          "fixture_def": {
+            "density": 0.5,
+            "restitution": 0.2,
+            "friction": 0.1,
+            "categoryBits": 1,
+            "maskBits": 1,
+            "isSensor": true
+          },
+          "shapes": [
+            {
+              "type": "circle",
+              "m_position": {
+                "x": 0,
+                "y": 0
+              },
+              "m_radius": 1
+            }
+          ]
+        }
+      ]
     }
-  }
+  ]
 }

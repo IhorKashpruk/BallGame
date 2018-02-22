@@ -41,6 +41,12 @@ public:
     }
 
     void update() {
+        static std::vector<Event> events = {};
+        if(!EventManager::getInstance().empty()) {
+            events.clear();
+            EventManager::getInstance().get(events);
+            executeEvents(events);
+        }
         for(auto& uio: uios_) {
             uio->update();
         }
@@ -92,8 +98,8 @@ public:
         }
     }
 
-    void check(const EventType &event, const Point &point) {
-        SpecEventType specEventType;
+    void check(const EVENT &event, const Point &point) {
+        CONTEXT_EVENT specEventType;
         AUIO* tmp = getUnder(point);
         if(tmp == nullptr) {
             if(selected_uio_) {
@@ -118,10 +124,10 @@ public:
         displayEvent(specEventType, point);
     }
 
-    void check(const EventType &event, const char* key) {
+    void check(const EVENT &event, const char* key) {
         if(selected_uio_ == nullptr)
             return;
-        SpecEventType specEventType = SpecEventType::ENTER_KEY;
+        CONTEXT_EVENT specEventType = getPreviousEvent().add(event);
         displayEvent(specEventType,{}, key);
     }
 
@@ -133,23 +139,31 @@ private:
         }
         return nullptr;
     }
-    void displayEvent(const SpecEventType& event, const Point& point, const char* key="") {
+    void displayEvent(const CONTEXT_EVENT& event, const Point& point, const char* key="") {
         switch (event) {
-            case SpecEventType::CLICK_LEFT_BUTTON:
+            case CONTEXT_EVENT::CLICK_LEFT_BUTTON:
                 selected_uio_->setColorScheme(theme::base::all.clk);
                 selected_uio_->clickLeftButton(point);
                 break;
-            case SpecEventType::CLICK_RIGHT_BUTTON:
+            case CONTEXT_EVENT::CLICK_RIGHT_BUTTON:
                 selected_uio_->setColorScheme(theme::base::all.clk);
                 selected_uio_->clickRightButton(point);
                 break;
-            case SpecEventType::ENTER_KEY:
+            case CONTEXT_EVENT::ENTER_KEY:
                 selected_uio_->enterKey(key);
                 break;
-            case SpecEventType::MOUSE_MOVE:
+            case CONTEXT_EVENT::MOUSE_MOVE:
                 selected_uio_->mouseMove(point);
                 break;
-            case SpecEventType::NONE:break;
+            case CONTEXT_EVENT::NONE:break;
+        }
+    }
+    void executeEvents(const std::vector<Event>& events) {
+        for(const auto& event: events) {
+            switch(event.device) {
+                case DEVICE::MOUSE: check(event.event, event.point); break;
+                case DEVICE::KEYBOARD: check(event.event, event.key); break;
+            }
         }
     }
 protected:

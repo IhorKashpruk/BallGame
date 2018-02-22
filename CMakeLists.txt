@@ -2,8 +2,7 @@ cmake_minimum_required(VERSION 3.7)
 project(testC__)
 
 set(CMAKE_CXX_STANDARD 17)
-#set(CMAKE_CXX_FLAGS "-O3 -Wall -pedantic -Wno-unused -Wextra")
-set(CMAKE_CXX_FLAGS)
+set(CMAKE_CXX_FLAGS "-O3 -Wall -pedantic -Wno-unused -Wextra")
 
 file(GLOB Box2D_Code
         "src/libs/Box2D/Collision/*"
@@ -61,7 +60,9 @@ set(SOURCE_FILES main.cpp
         src/ui/interfaces/Colorful.h
         src/ui/Label.h
         src/ui/interfaces/IText.h
-        src/ui/physics/Influential.h src/ui/physics/InfluentialPUIO.h src/ui/physics/ContactListener.h)
+        src/ui/physics/Influential.h
+        src/ui/physics/InfluentialPUIO.h
+        src/ui/physics/ContactListener.h src/EventManager.h)
 
 include_directories(src)
 include_directories(src/libs)

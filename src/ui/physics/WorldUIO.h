@@ -4,6 +4,7 @@
 #include <ui/ModernContext.h>
 #include <ui/UIO.h>
 #include <Draftsman.h>
+#include <theme_properties.h>
 #include "WorldWrapper.h"
 #include "ContactListener.h"
 
@@ -40,6 +41,9 @@ public:
             ModernContext<Logic>::draw();
         }
         Draftsman::getInstance().draw(UIO<Shape>::shape_, UIO<Shape>::colorScheme_);
+        if(UIO<Shape>::colorScheme_ == theme::base::all.clk) {
+            UIO<Shape>::colorScheme_ = theme::base::all.sel;
+        }
     }
     void draw(const Point& offset) override {
 

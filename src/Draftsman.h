@@ -210,7 +210,8 @@ private:
             return false;
         }
 
-        font = TTF_OpenFont("fonts/Capture_it.ttf", 18);
+        font = TTF_OpenFont("fonts/Pacifico.ttf", 18);
+//        font = TTF_OpenFont("fonts/Capture_it.ttf", 18);
 
         if(!font) {
             PRINT_ERROR("TTF_OpenFont", SDL_GetError());

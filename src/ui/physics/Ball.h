@@ -4,6 +4,7 @@
 #include <utility/primitive_types.h>
 #include "ui/physics/PUIO.h"
 #include <atomic>
+#include <map>
 
 
 class Ball : public PUIO {
@@ -11,25 +12,30 @@ public:
     struct properties {
         float speed;
     };
+
     enum class DIRECTION {
         UP,
         DOWN,
         LEFT,
         RIGHT,
+        LEFT_UP,
+        RIGHT_UP,
         STOP,
         NONE
     };
     explicit Ball(std::string&& id,
                   box2d::WorldWrapper& world,
                   b2BodyDef& bodyDef,
-                  const properties& prop) :
-            PUIO(std::move(id), world, bodyDef),
+                  const properties& prop,
+                  EntityCategory entityCategory) :
+            PUIO(std::move(id), world, bodyDef, entityCategory),
             properties_(prop){ PUIO::setUserData(this); }
     explicit Ball(std::string&& id,
                   box2d::WorldWrapper& world,
                   b2BodyDef&& bodyDef,
-                  properties&& prop) :
-            PUIO(std::move(id), world, bodyDef),
+                  properties&& prop,
+                  EntityCategory entityCategory) :
+            PUIO(std::move(id), world, bodyDef, entityCategory),
             properties_(prop) { PUIO::setUserData(this); }
     ~Ball() override = default;
 
@@ -63,21 +69,30 @@ public:
 
     void update() override {
         PUIO::update();
-        switch (direction_.load()) {
+        if(!onGround_) {
+            return;
+        }
+        switch (direction()) {
             case DIRECTION::UP:
-                addForce(b2Vec2{0.0f, properties_.speed});
+                addVelocity(b2Vec2{0.0f, properties_.speed});
                 break;
             case DIRECTION::DOWN:
-                addForce(b2Vec2{0.0f, -properties_.speed});
+                addVelocity(b2Vec2{0.0f, -properties_.speed});
                 break;
             case DIRECTION::LEFT:
-                addForce(b2Vec2{-properties_.speed, 0.0f});
+                addVelocity(b2Vec2{-properties_.speed, 0.0f});
                 break;
             case DIRECTION::RIGHT:
-                addForce(b2Vec2{properties_.speed, 0.0f});
+                addVelocity(b2Vec2{properties_.speed, 0.0f});
+                break;
+            case DIRECTION::LEFT_UP:
+                addVelocity(b2Vec2{-properties_.speed, properties_.speed});
+                break;
+            case DIRECTION::RIGHT_UP:
+                addVelocity(b2Vec2{properties_.speed, properties_.speed});
                 break;
             case DIRECTION::STOP:
-                addForce(b2Vec2{0.0f, 0.0f});
+                addVelocity(b2Vec2{0.0f, 0.0f});
                 break;
             case DIRECTION::NONE:
                 break;
@@ -85,12 +100,26 @@ public:
         direction_ = DIRECTION::NONE;
     }
 
-    void setDirection(DIRECTION direction) { direction_ = direction; }
-    DIRECTION getDirection() { return direction_; }
+    void onGround(bool value) { onGround_ = value; }
+    bool onGround() const { return onGround_; }
 
 private:
     properties properties_;
-    std::atomic<DIRECTION> direction_ {DIRECTION::NONE};
+    DIRECTION direction_ {DIRECTION::NONE};
+    bool onGround_ = false;
+
+    typename Ball::DIRECTION direction() {
+#define KEY_DOWN(key) EventManager::getInstance().keyIsDown(key)
+        if(KEY_DOWN("Up") && KEY_DOWN("Left"))  { return Ball::DIRECTION::LEFT_UP; }
+        if(KEY_DOWN("Up") && KEY_DOWN("Right")) { return Ball::DIRECTION::RIGHT_UP; }
+        if(KEY_DOWN("Up"))      { return Ball::DIRECTION::UP; }
+        if(KEY_DOWN("Down"))    { return Ball::DIRECTION::DOWN; }
+        if(KEY_DOWN("Left"))    { return Ball::DIRECTION::LEFT; }
+        if(KEY_DOWN("Right"))   { return Ball::DIRECTION::RIGHT; }
+        if(KEY_DOWN("Space"))   { return Ball::DIRECTION::STOP; }
+        return Ball::DIRECTION::NONE;
+#undef KEY_DOWN
+    }
 };
 
 

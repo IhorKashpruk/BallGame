@@ -7,15 +7,25 @@
 template <class Influential>
 class InfluentialPUIO : public PUIO, public Influential {
 public:
-    explicit InfluentialPUIO(std::string &&id, box2d::WorldWrapper &world, b2BodyDef &&bodyDef, typename Influential::properties&& properties)
-            : PUIO(id, world, bodyDef),
+    explicit InfluentialPUIO(
+            std::string &&id,
+            box2d::WorldWrapper &world,
+            b2BodyDef &&bodyDef,
+            typename Influential::properties&& properties,
+            EntityCategory entityCategory)
+            : PUIO(id, world, bodyDef, entityCategory),
               Influential(properties) {
         Influential* p = static_cast<Influential*>(this);
         setUserData(p);
         Influential::setOwner(this);
     }
-    explicit InfluentialPUIO(const std::string &id, box2d::WorldWrapper &world, b2BodyDef &bodyDef, const typename Influential::properties& properties)
-            : PUIO(id, world, bodyDef),
+    explicit InfluentialPUIO(
+            const std::string &id,
+            box2d::WorldWrapper &world,
+            b2BodyDef &bodyDef,
+            const typename Influential::properties& properties,
+            EntityCategory entityCategory)
+            : PUIO(id, world, bodyDef, entityCategory),
               Influential(properties) {
         Influential* p = static_cast<Influential*>(this);
         setUserData(p);

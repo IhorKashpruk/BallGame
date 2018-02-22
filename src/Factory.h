@@ -99,6 +99,7 @@ void from_json(const json& j, b2BodyDef& bodyDef) {
     bodyDef.position = j.at("position").get<b2Vec2>();
     bodyDef.angle = j.at("angle").get<float>();
     bodyDef.bullet = j.at("bullet").get<float>();
+    bodyDef.fixedRotation = j.at("fixedRotation").get<bool>();
 }
 
 void to_json(json& j, const b2CircleShape& circleShape) {
@@ -210,20 +211,20 @@ namespace factory {
 
     template <>
     PUIO* get<PUIO>(json& j, WorldUIO<WorldLogic, pt::Rectangle>& context) {
-        PUIO* puio = new PUIO(j["id"], *context.getWorld(), j["body_def"]);
+        PUIO* puio = new PUIO(j["id"], *context.getWorld(), j["body_def"], j["category"]);
         addFixture(j["shapes"], puio);
         return puio;
     }
     template <>
     Ball* get<Ball>(json& j, WorldUIO<WorldLogic, pt::Rectangle>& context) {
-        Ball* ball = new Ball(j["id"], *context.getWorld(), j["body_def"], j["properties"]);
+        Ball* ball = new Ball(j["id"], *context.getWorld(), j["body_def"], j["properties"], j["category"]);
         addFixture(j["shapes"], ball);
         return ball;
     }
 
     template <>
     InfluentialPUIO<Attractive>* get<InfluentialPUIO<Attractive>>(json& j, WorldUIO<WorldLogic, pt::Rectangle>& context) {
-        InfluentialPUIO<Attractive>* influentialPUIO = new InfluentialPUIO<Attractive>(j["id"], *context.getWorld(), j["body_def"], j["properties"]);
+        InfluentialPUIO<Attractive>* influentialPUIO = new InfluentialPUIO<Attractive>(j["id"], *context.getWorld(), j["body_def"], j["properties"], j["category"]);
         addFixture(j["shapes"], influentialPUIO);
         return influentialPUIO;
     }

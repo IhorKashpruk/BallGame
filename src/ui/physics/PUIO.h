@@ -8,8 +8,10 @@
 #include "utility/math_things.h"
 
 enum class EntityCategory {
-    NORMAL = 0x0001,
-    TRANSPARENT = 0x0002
+    PLAYER          = 0x0001,
+    FLOOR           = 0x0002,
+    PHYSICAL_OBJECT = 0x0003,
+    WALL            = 0x0004
 };
 
 class PUIO : public AUIO, public box2d::PO {
@@ -19,16 +21,20 @@ public:
 
     explicit PUIO(std::string id,
                    box2d::WorldWrapper& world,
-                   b2BodyDef& bodyDef)
+                   b2BodyDef& bodyDef,
+                  EntityCategory entityCategory)
             : AUIO(std::move(id)),
-              box2d::PO(world, bodyDef) {
+              box2d::PO(world, bodyDef),
+              entityCategory_(entityCategory) {
         setUserData(this);
     }
     explicit PUIO(std::string&& id,
                    box2d::WorldWrapper& world,
-                   b2BodyDef&& bodyDef)
+                   b2BodyDef&& bodyDef,
+                  EntityCategory entityCategory)
             : AUIO(std::move(id)),
-              box2d::PO(world, bodyDef) {
+              box2d::PO(world, bodyDef),
+              entityCategory_(entityCategory) {
         setUserData(this);
     }
 
@@ -134,7 +140,12 @@ public:
         notify(Signal{id_, STATE::MOUSE_MOVE, point});
     }
 
+    EntityCategory getEntityCategory() const {
+        return entityCategory_;
+    }
+
 private:
+    EntityCategory entityCategory_;
 };
 
 #endif //TESTC_PUIO_H

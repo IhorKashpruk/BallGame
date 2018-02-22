@@ -24,6 +24,9 @@ public:
 
     void draw() override {
         Draftsman::getInstance().draw(shape_, colorScheme_);
+        if(colorScheme_ == theme::base::all.clk) {
+            colorScheme_ = theme::base::all.sel;
+        }
     }
 
     void draw(const Point& offset) override {

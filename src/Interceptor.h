@@ -13,7 +13,7 @@ NOW_YOU_ARE_SINGLETON(Interceptor)
 public:
     inline bool interceptWithAction() {
         static SDL_Event event;
-        auto context = ContextManager::getInstance().getCurrentContext().lock();
+//        auto context = ContextManager::getInstance().getCurrentContext().lock();
 
         if (SDL_PollEvent(&event) == 0)
             return true;
@@ -23,14 +23,19 @@ public:
             case SDL_APP_TERMINATING:
                 return false;
             case SDL_MOUSEMOTION:
-                if(context != nullptr)
-                    context->check(EventType::MOUSE_MOVE, {event.button.x, event.button.y});
+            EventManager::getInstance().add(Event{DEVICE::MOUSE, EVENT::MOUSE_MOVE, {event.button.x, event.button.y}});
+//                if(context != nullptr)
+//                    context->check(EVENT::MOUSE_MOVE, {event.button.x, event.button.y});
                 break;
             case SDL_KEYDOWN:
-                if(context != nullptr)
-                    context->check(EventType::KEY_DOWN, SDL_GetKeyName(event.key.keysym.sym));
+                EventManager::getInstance().add(Event{DEVICE::KEYBOARD, EVENT::KEY_DOWN, {key: SDL_GetKeyName(event.key.keysym.sym)}});
+                EventManager::getInstance().setKeyDown(SDL_GetKeyName(event.key.keysym.sym));
+//                if(context != nullptr) {
+//                    context->check(EVENT::KEY_DOWN, SDL_GetKeyName(event.key.keysym.sym));
+//                }
                 break;
             case SDL_KEYUP:
+                EventManager::getInstance().setKeyUp(SDL_GetKeyName(event.key.keysym.sym));
                 // context.keyUp(SDL_GetKeyName(event.key.keysym.sym));
                 break;
             case SDL_TEXTEDITING:
@@ -42,12 +47,14 @@ public:
             case SDL_MOUSEBUTTONDOWN:
                 switch (event.button.button) {
                     case SDL_BUTTON_LEFT:
-                        if(context != nullptr)
-                            context->check(EventType::LEFT_BUTTON_DOWN, {event.button.x, event.button.y});
+                        EventManager::getInstance().add(Event{DEVICE::MOUSE, EVENT::LEFT_BUTTON_DOWN, {event.button.x, event.button.y}});
+//                        if(context != nullptr)
+//                            context->check(EVENT::LEFT_BUTTON_DOWN, {event.button.x, event.button.y});
                         break;
                     case SDL_BUTTON_RIGHT:
-                        if(context != nullptr)
-                            context->check(EventType::RIGHT_BUTTON_DOWN, {event.button.x, event.button.y});
+                        EventManager::getInstance().add(Event{DEVICE::MOUSE, EVENT::RIGHT_BUTTON_DOWN, {event.button.x, event.button.y}});
+//                        if(context != nullptr)
+//                            context->check(EVENT::RIGHT_BUTTON_DOWN, {event.button.x, event.button.y});
                         break;
                     default:break;
                 }
@@ -55,12 +62,16 @@ public:
             case SDL_MOUSEBUTTONUP:
                 switch (event.button.button) {
                     case SDL_BUTTON_LEFT:
-                        if(context != nullptr)
-                            context->check(EventType::LEFT_BUTTON_UP, {event.button.x, event.button.y});
+                        EventManager::getInstance().add(Event{DEVICE::MOUSE, EVENT::LEFT_BUTTON_UP, {event.button.x, event.button.y}});
+
+//                        if(context != nullptr)
+//                            context->check(EVENT::LEFT_BUTTON_UP, {event.button.x, event.button.y});
                         break;
                     case SDL_BUTTON_RIGHT:
-                        if(context != nullptr)
-                            context->check(EventType::RIGHT_BUTTON_UP, {event.button.x, event.button.y});
+                        EventManager::getInstance().add(Event{DEVICE::MOUSE, EVENT::RIGHT_BUTTON_UP, {event.button.x, event.button.y}});
+
+//                        if(context != nullptr)
+//                            context->check(EVENT::RIGHT_BUTTON_UP, {event.button.x, event.button.y});
                         break;
                     default:break;
                 }
