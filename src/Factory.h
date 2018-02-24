@@ -180,7 +180,18 @@ void from_json(const json& j, Attractive::properties& properties) {
     properties.force = j["force"].get<float>();
 }
 
+namespace box2d {
+    void to_json(json &j, const WorldWrapper::properties &properties) {
+        j = json{};
+    }
 
+    void from_json(const json &j, WorldWrapper::properties &properties) {
+        properties.gravity = j["gravity"].get<b2Vec2>();
+        properties.position_iterations = j["position_iterations"].get<int>();
+        properties.velocity_iterations = j["velocity_iterations"].get<int>();
+        properties.time_step = j["time_step"].get<float>();
+    }
+}
 
 namespace factory {
 
@@ -276,6 +287,8 @@ namespace factory {
     }
 
     void build(json& j, WorldUIO<WorldLogic, pt::Rectangle>& context) {
+        box2d::WorldWrapper::properties properties = j["world_properties"];
+        context.resetWorld(new box2d::WorldWrapper(properties));
         for (auto& it: j["puios"]) {
             buildPUIO(it, context);
         }

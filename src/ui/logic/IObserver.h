@@ -5,6 +5,7 @@
 #include <utility>
 #include <string>
 
+class AUIO;
 enum class STATE {
     LEFT_BUTTON_CLICK,
     RIGHT_BUTTON_CLICK,
@@ -20,13 +21,13 @@ enum class STATE {
 
 class Signal {
 public:
-    explicit Signal(std::string uio_id, STATE state, std::any value = nullptr)
-            : uio_id_(std::move(uio_id)), state_(state), value_(std::move(value)) {}
-    STATE& getState()           { return state_; }
-    std::any& getValue()        { return value_; }
-    std::string& getUIOID()     { return uio_id_;}
+    explicit Signal(AUIO* uio_id, STATE state, std::any value = nullptr)
+            : auio_(uio_id), state_(state), value_(std::move(value)) {}
+    STATE& getState()       { return state_; }
+    std::any& getValue()    { return value_; }
+    AUIO* getAUIO()         { return auio_;}
 private:
-    std::string uio_id_;
+    AUIO* auio_;
     STATE state_;
     std::any value_;
 };

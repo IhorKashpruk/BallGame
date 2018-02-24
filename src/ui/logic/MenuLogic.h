@@ -11,12 +11,12 @@ public:
     explicit MenuLogic(Context* context) : AContextLogic(context) {}
 public:
     void update(Signal signal) override {
-        if(signal.getUIOID() == "start_bt" && signal.getState() == STATE::LEFT_BUTTON_CLICK) {
+        if(signal.getAUIO()->getID() == "start_bt" && signal.getState() == STATE::LEFT_BUTTON_CLICK) {
             level::LevelManager::getInstance().buildNextLevel();
             ContextManager::getInstance().setCurrentContext("game_context");
             return;
         }
-        if(signal.getUIOID() == "exit_bt" && signal.getState() == STATE::LEFT_BUTTON_CLICK) {
+        if(signal.getAUIO()->getID() == "exit_bt" && signal.getState() == STATE::LEFT_BUTTON_CLICK) {
             Game::getInstance().stop();
         }
     }

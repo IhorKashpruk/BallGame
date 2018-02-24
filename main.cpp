@@ -42,8 +42,6 @@ void createBasicContext() {
 }
 
 int main() {
-
-
     Game::getInstance().setUp();
     createBasicContext();
     Game::getInstance().loop();

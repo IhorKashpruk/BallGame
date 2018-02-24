@@ -6,19 +6,18 @@
 #include "box2d_properties.h"
 
 namespace box2d {
-    struct WorldProperties {
-        float32 time_step           = box2d_properties::time_step;
-        int32 velocity_iterations   = box2d_properties::velocity_iterations;
-        int32 position_iterations   = box2d_properties::position_iterations;
-        b2Vec2 gravity {box2d_properties::gravity_x, box2d_properties::gravity_y};
-    };
-
     class WorldWrapper {
         typedef std::unique_ptr<b2World> world_ptr;
     public:
-        explicit WorldWrapper(WorldProperties& worldProperties)
-                : properties_(std::move(worldProperties)),
-                  world_(new b2World{worldProperties.gravity}) {}
+        struct properties {
+            float32 time_step           = box2d_properties::time_step;
+            int32 velocity_iterations   = box2d_properties::velocity_iterations;
+            int32 position_iterations   = box2d_properties::position_iterations;
+            b2Vec2 gravity {box2d_properties::gravity_x, box2d_properties::gravity_y};
+        };
+        explicit WorldWrapper(properties& prop)
+                : properties_(std::move(prop)),
+                  world_(new b2World{prop.gravity}) {}
 
         explicit WorldWrapper()
                 : properties_(),
@@ -79,7 +78,7 @@ namespace box2d {
         }
         b2World* getWorld() const { return &*world_;}
     private:
-        WorldProperties properties_;
+        properties properties_;
         world_ptr world_ ;
     };
 }

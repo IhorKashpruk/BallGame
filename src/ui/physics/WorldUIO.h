@@ -14,10 +14,10 @@ class WorldUIO : public ModernContext<Logic>, public UIO<Shape> {
     typedef pt::point<T> Point;
     typedef std::unique_ptr<box2d::WorldWrapper> world_ui_ptr;
 public:
-    explicit WorldUIO(std::string id, const Shape<T>& shape, box2d::WorldProperties& worldProperties)
+    explicit WorldUIO(std::string id, const Shape<T>& shape, box2d::WorldWrapper::properties& prop)
             : ModernContext<Logic>(),
               UIO<Shape>(std::move(id), shape),
-              world_(new box2d::WorldWrapper(worldProperties)) {}
+              world_(new box2d::WorldWrapper(prop)) {}
     explicit WorldUIO(std::string id, const Shape<T>& shape)
             : ModernContext<Logic>(),
               UIO<Shape>(std::move(id), shape),

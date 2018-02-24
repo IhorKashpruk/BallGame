@@ -11,7 +11,8 @@ enum class EntityCategory {
     PLAYER          = 0x0001,
     FLOOR           = 0x0002,
     PHYSICAL_OBJECT = 0x0003,
-    WALL            = 0x0004
+    WALL            = 0x0004,
+    EXIT            = 0x0009
 };
 
 class PUIO : public AUIO, public box2d::PO {
@@ -125,19 +126,19 @@ public:
     }
 
     void clickLeftButton(const Point& point) override {
-        notify(Signal{id_, STATE::LEFT_BUTTON_CLICK, point});
+        notify(Signal{this, STATE::LEFT_BUTTON_CLICK, point});
     }
 
     void clickRightButton(const Point& point) override {
-        notify(Signal{id_, STATE::RIGHT_BUTTON_CLICK, point});
+        notify(Signal{this, STATE::RIGHT_BUTTON_CLICK, point});
     }
 
     void enterKey(const char* key) override {
-        notify(Signal{id_, STATE::ENTER_KEY, key});
+        notify(Signal{this, STATE::ENTER_KEY, key});
     }
 
     void mouseMove(const Point& point) override {
-        notify(Signal{id_, STATE::MOUSE_MOVE, point});
+        notify(Signal{this, STATE::MOUSE_MOVE, point});
     }
 
     EntityCategory getEntityCategory() const {
