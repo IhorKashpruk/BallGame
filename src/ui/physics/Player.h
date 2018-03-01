@@ -14,6 +14,11 @@ public:
         float jump_force;
     };
 
+    struct floor_contact {
+        int count = 0;
+        bool onGround() const { return (bool)count; }
+    };
+
     enum class DIRECTION {
         UP,
         DOWN,
@@ -66,7 +71,28 @@ public:
 
     void update() override {
         PUIO::update();
-        if(!onGround_) {
+        if(!floor_contact_.onGround()) {
+            switch (direction()) {
+                case DIRECTION::LEFT:
+                    addForce(b2Vec2{-properties_.move_force, 0.0f});
+                    break;
+                case DIRECTION::RIGHT:
+                    addForce(b2Vec2{properties_.move_force, 0.0f});
+                    break;
+                case DIRECTION::LEFT_UP:
+                    addForce(b2Vec2{-properties_.move_force, 0.0f});
+                    break;
+                case DIRECTION::RIGHT_UP:
+                    addForce(b2Vec2{properties_.move_force, 0.0f});
+                    break;
+                case DIRECTION::STOP:
+                    addForce(b2Vec2{0.0f, 0.0f});
+                    break;
+                case DIRECTION::NONE:
+                    break;
+                default:
+                    return;
+            };
             return;
         }
         switch (direction()) {
@@ -83,10 +109,10 @@ public:
                 addVelocity(b2Vec2{properties_.move_force, 0.0f});
                 break;
             case DIRECTION::LEFT_UP:
-                addVelocity(b2Vec2{-properties_.jump_force, properties_.jump_force});
+                addVelocity(b2Vec2{-properties_.jump_force/3.0f, properties_.jump_force});
                 break;
             case DIRECTION::RIGHT_UP:
-                addVelocity(b2Vec2{properties_.jump_force, properties_.jump_force});
+                addVelocity(b2Vec2{properties_.jump_force/3.0f, properties_.jump_force});
                 break;
             case DIRECTION::STOP:
                 addVelocity(b2Vec2{0.0f, 0.0f});
@@ -96,12 +122,9 @@ public:
         };
     }
 
-    void onGround(bool value) { onGround_ = value; }
-    bool onGround() const { return onGround_; }
-
     void beginContact(PUIO *puio) override {
         if(puio->getEntityCategory() == EntityCategory::FLOOR) {
-            onGround(true);
+            floor_contact_.count++;
         }
         if(puio->getEntityCategory() == EntityCategory::EXIT) {
             notify(Signal{this, STATE::END_GAME, nullptr});
@@ -110,13 +133,13 @@ public:
 
     void endContact(PUIO *puio) override {
         if(puio->getEntityCategory() == EntityCategory::FLOOR) {
-            onGround(false);
+            floor_contact_.count--;
         }
     }
 
 private:
     properties properties_;
-    bool onGround_ = false;
+    floor_contact floor_contact_;
 
     typename Player::DIRECTION direction() {
 #define KEY_DOWN(key) EventManager::getInstance().keyIsDown(key)
