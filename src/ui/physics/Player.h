@@ -1,16 +1,17 @@
-#ifndef TESTC_BALL_H
-#define TESTC_BALL_H
+#ifndef TESTC_PLAYER_H
+#define TESTC_PLAYER_H
 
 #include <utility/primitive_types.h>
 #include "ui/physics/PUIO.h"
 #include <atomic>
 #include <map>
+#include <EventManager.h>
 
-
-class Ball : public PUIO {
+class Player : public PUIO {
 public:
     struct properties {
-        float speed;
+        float move_force;
+        float jump_force;
     };
 
     enum class DIRECTION {
@@ -23,21 +24,25 @@ public:
         STOP,
         NONE
     };
-    explicit Ball(std::string&& id,
+    explicit Player(std::string&& id,
                   box2d::WorldWrapper& world,
                   b2BodyDef& bodyDef,
                   const properties& prop,
                   EntityCategory entityCategory) :
             PUIO(std::move(id), world, bodyDef, entityCategory),
-            properties_(prop){ PUIO::setUserData(this); }
-    explicit Ball(std::string&& id,
+            properties_(prop){
+        setUserData(this);
+    }
+    explicit Player(std::string&& id,
                   box2d::WorldWrapper& world,
                   b2BodyDef&& bodyDef,
                   properties&& prop,
                   EntityCategory entityCategory) :
             PUIO(std::move(id), world, bodyDef, entityCategory),
-            properties_(prop) { PUIO::setUserData(this); }
-    ~Ball() override = default;
+            properties_(prop) {
+        setUserData(this);
+    }
+    ~Player() override = default;
 
     void addForce(b2Vec2 force) {
         PUIO::body_->ApplyForce(force, PUIO::body_->GetWorldCenter(), true);
@@ -59,14 +64,6 @@ public:
         );
     }
 
-    float getSpeed() const {
-        return properties_.speed;
-    }
-
-    void setSpeed(float speed) {
-        properties_.speed = speed;
-    }
-
     void update() override {
         PUIO::update();
         if(!onGround_) {
@@ -74,22 +71,22 @@ public:
         }
         switch (direction()) {
             case DIRECTION::UP:
-                addVelocity(b2Vec2{0.0f, properties_.speed});
+                addVelocity(b2Vec2{0.0f, properties_.jump_force});
                 break;
             case DIRECTION::DOWN:
-                addVelocity(b2Vec2{0.0f, -properties_.speed});
+                addVelocity(b2Vec2{0.0f, -properties_.jump_force});
                 break;
             case DIRECTION::LEFT:
-                addVelocity(b2Vec2{-properties_.speed, 0.0f});
+                addVelocity(b2Vec2{-properties_.move_force, 0.0f});
                 break;
             case DIRECTION::RIGHT:
-                addVelocity(b2Vec2{properties_.speed, 0.0f});
+                addVelocity(b2Vec2{properties_.move_force, 0.0f});
                 break;
             case DIRECTION::LEFT_UP:
-                addVelocity(b2Vec2{-properties_.speed, properties_.speed});
+                addVelocity(b2Vec2{-properties_.jump_force, properties_.jump_force});
                 break;
             case DIRECTION::RIGHT_UP:
-                addVelocity(b2Vec2{properties_.speed, properties_.speed});
+                addVelocity(b2Vec2{properties_.jump_force, properties_.jump_force});
                 break;
             case DIRECTION::STOP:
                 addVelocity(b2Vec2{0.0f, 0.0f});
@@ -97,30 +94,43 @@ public:
             case DIRECTION::NONE:
                 break;
         };
-        direction_ = DIRECTION::NONE;
     }
 
     void onGround(bool value) { onGround_ = value; }
     bool onGround() const { return onGround_; }
 
+    void beginContact(PUIO *puio) override {
+        if(puio->getEntityCategory() == EntityCategory::FLOOR) {
+            onGround(true);
+        }
+        if(puio->getEntityCategory() == EntityCategory::EXIT) {
+            notify(Signal{this, STATE::END_GAME, nullptr});
+        }
+    }
+
+    void endContact(PUIO *puio) override {
+        if(puio->getEntityCategory() == EntityCategory::FLOOR) {
+            onGround(false);
+        }
+    }
+
 private:
     properties properties_;
-    DIRECTION direction_ {DIRECTION::NONE};
     bool onGround_ = false;
 
-    typename Ball::DIRECTION direction() {
+    typename Player::DIRECTION direction() {
 #define KEY_DOWN(key) EventManager::getInstance().keyIsDown(key)
-        if(KEY_DOWN("Up") && KEY_DOWN("Left"))  { return Ball::DIRECTION::LEFT_UP; }
-        if(KEY_DOWN("Up") && KEY_DOWN("Right")) { return Ball::DIRECTION::RIGHT_UP; }
-        if(KEY_DOWN("Up"))      { return Ball::DIRECTION::UP; }
-        if(KEY_DOWN("Down"))    { return Ball::DIRECTION::DOWN; }
-        if(KEY_DOWN("Left"))    { return Ball::DIRECTION::LEFT; }
-        if(KEY_DOWN("Right"))   { return Ball::DIRECTION::RIGHT; }
-        if(KEY_DOWN("Space"))   { return Ball::DIRECTION::STOP; }
-        return Ball::DIRECTION::NONE;
+        if(KEY_DOWN("Up") && KEY_DOWN("Left"))  { return DIRECTION::LEFT_UP; }
+        if(KEY_DOWN("Up") && KEY_DOWN("Right")) { return DIRECTION::RIGHT_UP; }
+        if(KEY_DOWN("Up"))      { return DIRECTION::UP; }
+        if(KEY_DOWN("Down"))    { return DIRECTION::DOWN; }
+        if(KEY_DOWN("Left"))    { return DIRECTION::LEFT; }
+        if(KEY_DOWN("Right"))   { return DIRECTION::RIGHT; }
+        if(KEY_DOWN("Space"))   { return DIRECTION::STOP; }
+        return DIRECTION::NONE;
 #undef KEY_DOWN
     }
 };
 
 
-#endif //TESTC_BALL_H
+#endif //TESTC_PLAYER_H

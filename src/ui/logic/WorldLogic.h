@@ -7,7 +7,10 @@ class WorldLogic : public AContextLogic {
 public:
     explicit WorldLogic(Context* context) : AContextLogic(context) {}
 public:
-    void update(Signal signal) override {
+    void update(const Signal& signal) override {
+        if(signal.getState() == STATE::END_GAME) {
+            ContextManager::getInstance().setCurrentContext("menu_context");
+        }
     }
 };
 

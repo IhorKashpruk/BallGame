@@ -6,10 +6,10 @@
 #include <ui/physics/PO.h>
 #include <ui/physics/WorldUIO.h>
 #include <ui/logic/WorldLogic.h>
-#include <ui/physics/Ball.h>
 #include <ui/physics/Windmill.h>
 #include <ui/physics/InfluentialPUIO.h>
 #include <ui/physics/Influential.h>
+#include <ui/physics/Player.h>
 
 using json = nlohmann::json;
 
@@ -157,14 +157,16 @@ void from_json(const json& j, b2RevoluteJointDef& revoluteJointDef) {
 }
 
 
-void to_json(json& j, const Ball::properties& properties) {
-    j = json{{"speed", properties.speed}};
+void to_json(json& j, const Player::properties& properties) {
+    j = json{{"move_force", properties.move_force}, {"jump_force", properties.jump_force}};
 }
 
-void from_json(const json& j, Ball::properties& properties) {
-    properties.speed = j.at("speed").get<float>();
+void from_json(const json& j, Player::properties& properties) {
+    properties.move_force = j.at("move_force").get<float>();
+    properties.jump_force = j.at("jump_force").get<float>();
 }
 
+// Windmill
 void to_json(json& j, const Windmill::properties& properties) {
     j = json{};
 }
@@ -172,6 +174,36 @@ void to_json(json& j, const Windmill::properties& properties) {
 void from_json(const json& j, Windmill::properties& properties) {
 }
 
+void to_json(json& j, const Windmill::blades_properties& properties) {
+    j = json{};
+}
+
+void from_json(const json& j, Windmill::blades_properties& properties) {
+    properties.fixture_def = j.at("fixture_def").get<b2FixtureDef>();
+    properties.body_def = j.at("body_def").get<b2BodyDef>();
+    properties.size = j.at("size").get<b2Vec2>();
+}
+
+void to_json(json& j, const Windmill::holder_properties& properties) {
+    j = json{};
+}
+
+void from_json(const json& j, Windmill::holder_properties& properties) {
+    properties.fixture_def = j.at("fixture_def").get<b2FixtureDef>();
+    properties.body_def = j.at("body_def").get<b2BodyDef>();
+    properties.radius = j.at("radius").get<float>();
+}
+
+void to_json(json& j, const Windmill::motor_properties& properties) {
+    j = json{};
+}
+
+void from_json(const json& j, Windmill::motor_properties& properties) {
+    properties.motor_speed = j.at("motorSpeed").get<float>();
+    properties.max_motor_torque = j.at("maxMotorTorque").get<float>();
+}
+
+// Attractive
 void to_json(json& j, const Attractive::properties& properties) {
     j = json{};
 }
@@ -227,10 +259,10 @@ namespace factory {
         return puio;
     }
     template <>
-    Ball* get<Ball>(json& j, WorldUIO<WorldLogic, pt::Rectangle>& context) {
-        Ball* ball = new Ball(j["id"], *context.getWorld(), j["body_def"], j["properties"], j["category"]);
-        addFixture(j["shapes"], ball);
-        return ball;
+    Player* get<Player>(json& j, WorldUIO<WorldLogic, pt::Rectangle>& context) {
+        Player* player = new Player(j["id"], *context.getWorld(), j["body_def"], j["properties"], j["category"]);
+        addFixture(j["shapes"], player);
+        return player;
     }
 
     template <>
@@ -242,27 +274,7 @@ namespace factory {
 
     template <>
     Windmill* get<Windmill>(json& j, WorldUIO<WorldLogic, pt::Rectangle>& context) {
-        Windmill* windmill = new Windmill(j["id"], j["properties"]);
-
-        for (auto& it: j["puios"]) {
-            if(it["class"] == "puio") {
-                PUIO* puio1 = get<PUIO>(it, context);
-                if(puio1->getID() == "blades") {
-                    windmill->setBlades(puio1);
-                }
-                if(puio1->getID() == "holder") {
-                    windmill->setHolder(puio1);
-                }
-            }
-        }
-        for(auto& it: j["joints"]) {
-            if(it["type"] == "revolute") {
-                b2RevoluteJointDef revoluteJointDef = it;
-                revoluteJointDef.bodyA = windmill->getBlades();
-                revoluteJointDef.bodyB = windmill->getHolder();
-                context.getWorld()->getWorld()->CreateJoint(&revoluteJointDef);
-            }
-        }
+        Windmill* windmill = new Windmill(j["id"], j["properties"], *context.getWorld(), j["blades"], j["holder"], j["motor"], j["category"]);
         return windmill;
     }
 
@@ -272,8 +284,8 @@ namespace factory {
             context.add(get<PUIO>(j, context));
             return;
         }
-        if(j["class"] == "ball") {
-            context.add(get<Ball>(j, context));
+        if(j["class"] == "player") {
+            context.add(get<Player>(j, context));
             return;
         }
 

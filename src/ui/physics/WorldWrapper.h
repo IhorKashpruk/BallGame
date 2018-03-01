@@ -60,6 +60,13 @@ namespace box2d {
             return circleShape;
         }
 
+        static b2CircleShape createCircleShape(const b2Vec2& position, float32 radius) {
+            b2CircleShape circleShape;
+            circleShape.m_p = position;
+            circleShape.m_radius = radius;
+            return circleShape;
+        }
+
         static b2FixtureDef createFixtureDef(const b2Shape& shape, float32 density, float32 restitution, float32 friction) {
             b2FixtureDef fixtureDef;
             fixtureDef.shape = &shape;

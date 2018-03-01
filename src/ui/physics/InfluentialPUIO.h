@@ -15,8 +15,7 @@ public:
             EntityCategory entityCategory)
             : PUIO(id, world, bodyDef, entityCategory),
               Influential(properties) {
-        Influential* p = static_cast<Influential*>(this);
-        setUserData(p);
+        setUserData(this);
         Influential::setOwner(this);
     }
     explicit InfluentialPUIO(
@@ -27,18 +26,26 @@ public:
             EntityCategory entityCategory)
             : PUIO(id, world, bodyDef, entityCategory),
               Influential(properties) {
-        Influential* p = static_cast<Influential*>(this);
-        setUserData(p);
+        setUserData(this);
         Influential::setOwner(this);
     }
 
-    ~InfluentialPUIO() = default;
+    ~InfluentialPUIO() override = default;
 
     void update() override {
         PUIO::update();
         Influential::update();
         Influential::work();
     }
+
+    void beginContact(PUIO *puio) override {
+        Influential::add(puio);
+    }
+
+    void endContact(PUIO *puio) override {
+        Influential::remove(puio);
+    }
+
 };
 
 #endif //TESTC_INFLUENTALPUIO_H

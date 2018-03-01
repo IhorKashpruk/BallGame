@@ -19,25 +19,28 @@ namespace box2d {
             PUIO* puio1 = static_cast<PUIO*>(bodyUserDataA);
             PUIO* puio2 = static_cast<PUIO*>(bodyUserDataB);
 
-            if(contact->GetFixtureA()->IsSensor()) {
-                IInfluential *influential = static_cast<IInfluential*>(bodyUserDataA);
-                influential->add(puio2);
-            }
+            puio1->beginContact(puio2);
+            puio2->beginContact(puio1);
 
-            if(contact->GetFixtureB()->IsSensor()) {
-                AInfluential *influential = static_cast<AInfluential*>(bodyUserDataB);
-                influential->add(puio1);
-            }
-
-            // Check if ball on the ground
-            if(puio1->getEntityCategory() == EntityCategory::PLAYER && puio2->getEntityCategory() == EntityCategory::FLOOR) {
-                Ball* ball = static_cast<Ball*>(puio1);
-                ball->onGround(true);
-            }
-            if(puio2->getEntityCategory() == EntityCategory::PLAYER && puio1->getEntityCategory() == EntityCategory::FLOOR) {
-                Ball* ball = static_cast<Ball*>(puio2);
-                ball->onGround(true);
-            }
+//            if(contact->GetFixtureA()->IsSensor()) {
+//                IInfluential *influential = static_cast<IInfluential*>(bodyUserDataA);
+//                influential->add(puio2);
+//            }
+//
+//            if(contact->GetFixtureB()->IsSensor()) {
+//                AInfluential *influential = static_cast<AInfluential*>(bodyUserDataB);
+//                influential->add(puio1);
+//            }
+//
+//            // Check if ball on the ground
+//            if(puio1->getEntityCategory() == EntityCategory::PLAYER && puio2->getEntityCategory() == EntityCategory::FLOOR) {
+//                Ball* ball = static_cast<Ball*>(puio1);
+//                ball->onGround(true);
+//            }
+//            if(puio2->getEntityCategory() == EntityCategory::PLAYER && puio1->getEntityCategory() == EntityCategory::FLOOR) {
+//                Ball* ball = static_cast<Ball*>(puio2);
+//                ball->onGround(true);
+//            }
         }
 
         void EndContact(b2Contact* contact) override {
@@ -50,25 +53,28 @@ namespace box2d {
             PUIO* puio1 = static_cast<PUIO*>(bodyUserDataA);
             PUIO* puio2 = static_cast<PUIO*>(bodyUserDataB);
 
-            if(contact->GetFixtureA()->IsSensor()) {
-                IInfluential *influential = static_cast<IInfluential*>(bodyUserDataA);
-                influential->remove(puio2);
-            }
-
-            if(contact->GetFixtureB()->IsSensor()) {
-                AInfluential *influential = static_cast<AInfluential*>(bodyUserDataB);
-                influential->remove(puio1);
-            }
-
-            // Check if ball on the ground
-            if(puio1->getEntityCategory() == EntityCategory::PLAYER && puio2->getEntityCategory() == EntityCategory::FLOOR) {
-                Ball* ball = static_cast<Ball*>(puio1);
-                ball->onGround(false);
-            }
-            if(puio2->getEntityCategory() == EntityCategory::PLAYER && puio1->getEntityCategory() == EntityCategory::FLOOR) {
-                Ball* ball = static_cast<Ball*>(puio2);
-                ball->onGround(false);
-            }
+            puio1->endContact(puio2);
+            puio2->endContact(puio1);
+//
+//            if(contact->GetFixtureA()->IsSensor()) {
+//                IInfluential *influential = static_cast<IInfluential*>(bodyUserDataA);
+//                influential->remove(puio2);
+//            }
+//
+//            if(contact->GetFixtureB()->IsSensor()) {
+//                AInfluential *influential = static_cast<AInfluential*>(bodyUserDataB);
+//                influential->remove(puio1);
+//            }
+//
+//            // Check if ball on the ground
+//            if(puio1->getEntityCategory() == EntityCategory::PLAYER && puio2->getEntityCategory() == EntityCategory::FLOOR) {
+//                Ball* ball = static_cast<Ball*>(puio1);
+//                ball->onGround(false);
+//            }
+//            if(puio2->getEntityCategory() == EntityCategory::PLAYER && puio1->getEntityCategory() == EntityCategory::FLOOR) {
+//                Ball* ball = static_cast<Ball*>(puio2);
+//                ball->onGround(false);
+//            }
         }
     };
 }

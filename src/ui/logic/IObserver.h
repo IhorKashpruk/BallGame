@@ -23,9 +23,9 @@ class Signal {
 public:
     explicit Signal(AUIO* uio_id, STATE state, std::any value = nullptr)
             : auio_(uio_id), state_(state), value_(std::move(value)) {}
-    STATE& getState()       { return state_; }
-    std::any& getValue()    { return value_; }
-    AUIO* getAUIO()         { return auio_;}
+    const STATE& getState() const      { return state_; }
+    const std::any& getValue() const    { return value_; }
+    AUIO* getAUIO()  const       { return auio_;}
 private:
     AUIO* auio_;
     STATE state_;
@@ -34,7 +34,8 @@ private:
 
 class IObserver {
 public:
-    virtual void update(Signal) = 0;
+    void update(Signal&& s) { update(s); };
+    virtual void update(const Signal&) = 0;
 };
 
 #endif //TESTC_IOBSERVER_H

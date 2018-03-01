@@ -13,19 +13,76 @@ public:
 
     };
 
-    explicit Windmill(std::string id, const properties& prop)
-            : AUIO(std::move(id)), properties_(prop)  {
+    struct blades_properties {
+        b2BodyDef body_def;
+        b2FixtureDef fixture_def;
+        b2Vec2 size;
+    };
+
+    struct holder_properties {
+        b2BodyDef body_def;
+        b2FixtureDef fixture_def;
+        float radius;
+    };
+
+    struct motor_properties {
+        float max_motor_torque;
+        float motor_speed;
+    };
+
+    explicit Windmill(std::string id,
+                      const properties& prop,
+                      box2d::WorldWrapper& world,
+                      blades_properties bladesProperties,
+                      holder_properties holderProperties,
+                      motor_properties motorProperties,
+                      EntityCategory entityCategory)
+            : AUIO(std::move(id)),
+              properties_(prop) {
+
+        // Create blades
+        b2Vec2 ps[4] = {
+                {-bladesProperties.size.x, bladesProperties.size.y},
+                {bladesProperties.size.x, bladesProperties.size.y},
+                {bladesProperties.size.x, -bladesProperties.size.y},
+                {-bladesProperties.size.x, -bladesProperties.size.y}
+        };
+        PUIO* blades_puio = new PUIO(id, world, bladesProperties.body_def, entityCategory);
+        // Add first blade
+        b2PolygonShape shape = box2d::WorldWrapper::createPolygonShape(ps, 4);
+        bladesProperties.fixture_def.shape = &shape;
+        blades_puio->createFixture(bladesProperties.fixture_def);
+        // Add second blade
+        ps[0] = {bladesProperties.size.y, bladesProperties.size.x};
+        ps[1] = {bladesProperties.size.y, -bladesProperties.size.x};
+        ps[2] = {-bladesProperties.size.y, bladesProperties.size.x};
+        ps[3] = {-bladesProperties.size.y, -bladesProperties.size.x};
+        shape = box2d::WorldWrapper::createPolygonShape(ps, 4);
+        bladesProperties.fixture_def.shape = &shape;
+        blades_puio->createFixture(bladesProperties.fixture_def);
+        blades.reset(blades_puio);
+
+        // Create holder
+        PUIO* holder_puio = new PUIO(id, world, holderProperties.body_def, entityCategory);
+        b2CircleShape circleShape = box2d::WorldWrapper::createCircleShape({0.0f, 0.0f}, holderProperties.radius);
+        holderProperties.fixture_def.shape = &circleShape;
+        holder_puio->createFixture(holderProperties.fixture_def);
+        holder.reset(holder_puio);
+
+        // Create joint
+        b2RevoluteJointDef revoluteJointDef;
+        revoluteJointDef.collideConnected = false;
+        revoluteJointDef.localAnchorA = {0.0f, 0.0f};
+        revoluteJointDef.localAnchorB = {0.0f, 0.0f};
+        revoluteJointDef.enableMotor = true;
+        revoluteJointDef.maxMotorTorque = motorProperties.max_motor_torque;
+        revoluteJointDef.motorSpeed = motorProperties.motor_speed;
+        revoluteJointDef.bodyA = blades_puio->body();
+        revoluteJointDef.bodyB = holder_puio->body();
+        world.getWorld()->CreateJoint(&revoluteJointDef);
     }
 
     ~Windmill() override = default;
-
-    void setBlades(PUIO* puio) {
-        puio->body()->SetUserData(this);
-        blades.reset(puio);
-    }
-    void setHolder(PUIO* puio) {
-        holder.reset(puio);
-    }
 
     b2Body* getBlades() { return blades->body(); }
     b2Body* getHolder() { return holder->body(); }

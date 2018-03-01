@@ -10,7 +10,7 @@ class MenuLogic : public AContextLogic {
 public:
     explicit MenuLogic(Context* context) : AContextLogic(context) {}
 public:
-    void update(Signal signal) override {
+    void update(const Signal& signal) override {
         if(signal.getAUIO()->getID() == "start_bt" && signal.getState() == STATE::LEFT_BUTTON_CLICK) {
             level::LevelManager::getInstance().buildNextLevel();
             ContextManager::getInstance().setCurrentContext("game_context");

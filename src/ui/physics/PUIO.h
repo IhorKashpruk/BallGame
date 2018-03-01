@@ -6,6 +6,8 @@
 #include "ui/UIO.h"
 #include "utility/other_things.h"
 #include "utility/math_things.h"
+#include <ui/interfaces/IContactResponder.h>
+
 
 enum class EntityCategory {
     PLAYER          = 0x0001,
@@ -15,7 +17,7 @@ enum class EntityCategory {
     EXIT            = 0x0009
 };
 
-class PUIO : public AUIO, public box2d::PO {
+class PUIO : public AUIO, public box2d::PO, public IContactResponder {
     typedef int T;
     typedef pt::point<T> Point;
 public:
@@ -26,8 +28,9 @@ public:
                   EntityCategory entityCategory)
             : AUIO(std::move(id)),
               box2d::PO(world, bodyDef),
+              IContactResponder(),
               entityCategory_(entityCategory) {
-        setUserData(this);
+        setUserData((PUIO*)this);
     }
     explicit PUIO(std::string&& id,
                    box2d::WorldWrapper& world,
@@ -35,8 +38,9 @@ public:
                   EntityCategory entityCategory)
             : AUIO(std::move(id)),
               box2d::PO(world, bodyDef),
+              IContactResponder(),
               entityCategory_(entityCategory) {
-        setUserData(this);
+        setUserData((PUIO*)this);
     }
 
     virtual ~PUIO() {
@@ -143,6 +147,12 @@ public:
 
     EntityCategory getEntityCategory() const {
         return entityCategory_;
+    }
+
+    void beginContact(PUIO* puio) override {
+    }
+
+    void endContact(PUIO* puio) override {
     }
 
 private:
