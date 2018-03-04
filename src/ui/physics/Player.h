@@ -3,8 +3,9 @@
 
 #include <utility/primitive_types.h>
 #include "ui/physics/PUIO.h"
-#include <atomic>
-#include <map>
+#include <algorithm>
+#include <vector>
+#include <functional>
 #include <EventManager.h>
 
 class Player : public PUIO {
@@ -15,8 +16,17 @@ public:
     };
 
     struct floor_contact {
-        int count = 0;
-        bool onGround() const { return (bool)count; }
+        bool onGround() const { return !fixtures.empty(); }
+        void add(const b2Fixture& fixture) {
+            fixtures.emplace_back(fixture);
+        }
+        void remove(const b2Fixture& fixture) {
+            fixtures.erase(std::remove_if(fixtures.begin(), fixtures.end(), [&fixture](const b2Fixture& f){
+                return &f == &fixture;
+            }), fixtures.end());
+        }
+    private:
+        std::vector<std::reference_wrapper<const b2Fixture>> fixtures {};
     };
 
     enum class DIRECTION {
@@ -74,16 +84,16 @@ public:
         if(!floor_contact_.onGround()) {
             switch (direction()) {
                 case DIRECTION::LEFT:
-                    addForce(b2Vec2{-properties_.move_force, 0.0f});
+                    addForce(b2Vec2{-properties_.move_force-1.0f, 0.0f});
                     break;
                 case DIRECTION::RIGHT:
-                    addForce(b2Vec2{properties_.move_force, 0.0f});
+                    addForce(b2Vec2{properties_.move_force-1.0f, 0.0f});
                     break;
                 case DIRECTION::LEFT_UP:
-                    addForce(b2Vec2{-properties_.move_force, 0.0f});
+                    addForce(b2Vec2{-properties_.move_force-1.0f, 0.0f});
                     break;
                 case DIRECTION::RIGHT_UP:
-                    addForce(b2Vec2{properties_.move_force, 0.0f});
+                    addForce(b2Vec2{properties_.move_force-1.0f, 0.0f});
                     break;
                 case DIRECTION::STOP:
                     addForce(b2Vec2{0.0f, 0.0f});
@@ -122,18 +132,20 @@ public:
         };
     }
 
-    void beginContact(PUIO *puio) override {
-        if(puio->getEntityCategory() == EntityCategory::FLOOR) {
-            floor_contact_.count++;
+    void beginContact(PUIO *puio, const b2Vec2& point, const b2Fixture& fixture) override {
+        if(puio->getEntityCategory() == EntityCategory::FLOOR && body_->GetPosition().y > point.y) {
+            SDL_Log("begin contact to the floor");
+            floor_contact_.add(fixture);
         }
         if(puio->getEntityCategory() == EntityCategory::EXIT) {
             notify(Signal{this, STATE::END_GAME, nullptr});
         }
     }
 
-    void endContact(PUIO *puio) override {
+    void endContact(PUIO *puio, const b2Vec2& point, const b2Fixture& fixture) override {
         if(puio->getEntityCategory() == EntityCategory::FLOOR) {
-            floor_contact_.count--;
+            SDL_Log("end contact to the floor");
+            floor_contact_.remove(fixture);
         }
     }
 

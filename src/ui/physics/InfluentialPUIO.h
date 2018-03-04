@@ -38,11 +38,11 @@ public:
         Influential::work();
     }
 
-    void beginContact(PUIO *puio) override {
+    void beginContact(PUIO *puio, const b2Vec2& point, const b2Fixture& fixture) override {
         Influential::add(puio);
     }
 
-    void endContact(PUIO *puio) override {
+    void endContact(PUIO *puio, const b2Vec2& point, const b2Fixture& fixture) override {
         Influential::remove(puio);
     }
 

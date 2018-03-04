@@ -16,12 +16,12 @@ namespace box2d {
                 return;
             }
 
+
             PUIO* puio1 = static_cast<PUIO*>(bodyUserDataA);
             PUIO* puio2 = static_cast<PUIO*>(bodyUserDataB);
-
-            puio1->beginContact(puio2);
-            puio2->beginContact(puio1);
-
+            contact->GetWorldManifold(&worldManifold);
+            puio1->beginContact(puio2, worldManifold.points[0], *contact->GetFixtureB());
+            puio2->beginContact(puio1, worldManifold.points[0], *contact->GetFixtureA());
 //            if(contact->GetFixtureA()->IsSensor()) {
 //                IInfluential *influential = static_cast<IInfluential*>(bodyUserDataA);
 //                influential->add(puio2);
@@ -53,8 +53,9 @@ namespace box2d {
             PUIO* puio1 = static_cast<PUIO*>(bodyUserDataA);
             PUIO* puio2 = static_cast<PUIO*>(bodyUserDataB);
 
-            puio1->endContact(puio2);
-            puio2->endContact(puio1);
+            contact->GetWorldManifold(&worldManifold);
+            puio1->endContact(puio2, worldManifold.points[0], *contact->GetFixtureB());
+            puio2->endContact(puio1, worldManifold.points[0], *contact->GetFixtureA());
 //
 //            if(contact->GetFixtureA()->IsSensor()) {
 //                IInfluential *influential = static_cast<IInfluential*>(bodyUserDataA);
@@ -76,6 +77,9 @@ namespace box2d {
 //                ball->onGround(false);
 //            }
         }
+
+    private:
+        b2WorldManifold worldManifold;
     };
 }
 

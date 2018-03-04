@@ -149,10 +149,10 @@ public:
         return entityCategory_;
     }
 
-    void beginContact(PUIO* puio) override {
+    void beginContact(PUIO* puio, const b2Vec2& point, const b2Fixture& fixture) override {
     }
 
-    void endContact(PUIO* puio) override {
+    void endContact(PUIO* puio, const b2Vec2& point, const b2Fixture& fixture) override {
     }
 
 private:
