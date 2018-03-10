@@ -7,6 +7,7 @@
 #include "utility/other_things.h"
 #include "utility/math_things.h"
 #include <ui/interfaces/IContactResponder.h>
+#include <theme_properties.h>
 
 
 enum class EntityCategory {
@@ -72,54 +73,11 @@ public:
         for(b2Fixture* fixture = body_->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
             b2Shape::Type shapeType = fixture->GetType();
             if (shapeType == b2Shape::e_circle) {
-
-                b2CircleShape* circleShape = (b2CircleShape*)fixture->GetShape();
-                b2Vec2 new_center;
-                if(circleShape->m_p.x == 0.0f && circleShape->m_p.y == 0.0f) {
-                    new_center = body_->GetPosition();
-                } else {
-                    float angle = other_things::angle(circleShape->m_p);
-                    angle += body_->GetAngle();
-                    new_center = other_things::rotateb2Vec2(
-                            angle,
-                            other_things::radius(circleShape->m_p)
-                    );
-                    new_center.x += body_->GetPosition().x;
-                    new_center.y += body_->GetPosition().y;
-                }
-                pt::Circle<int> circle = other_things::toCircle(
-                        {new_center.x,
-                         new_center.y},
-                        circleShape->m_radius,
-                        body_->GetAngle()
-                );
+                pt::Circle<int> circle = other_things::toCirce(body_, (b2CircleShape*)fixture->GetShape());
                 Draftsman::getInstance().draw(circle, colorScheme_);
             }
-            else if (shapeType == b2Shape::e_polygon)
-            {
-                b2PolygonShape* polygonShape = (b2PolygonShape*)fixture->GetShape();
-                pt::Polygon<int> polygon;
-                if(polygonShape->m_centroid.x == 0.0f && polygonShape->m_centroid.y == 0.0f) {
-                    polygon = other_things::toPolygon(
-                            body_->GetPosition(),
-                            polygonShape->m_vertices,
-                            polygonShape->m_count,
-                            body_->GetAngle()
-                    );
-                } else {
-                    float angle = other_things::angle(polygonShape->m_centroid) + body_->GetAngle();
-                    b2Vec2 new_center = other_things::rotateb2Vec2(
-                            angle,
-                            other_things::radius(polygonShape->m_centroid)
-                    );
-
-                    polygon = other_things::toPolygon(
-                            new_center,
-                            polygonShape->m_vertices,
-                            polygonShape->m_count,
-                            body_->GetAngle()
-                    );
-                }
+            else if (shapeType == b2Shape::e_polygon) {
+                pt::Polygon<int> polygon = other_things::toPolygon(body_, (b2PolygonShape*)fixture->GetShape());
                 Draftsman::getInstance().draw(polygon, colorScheme_);
             }
         }
@@ -150,9 +108,11 @@ public:
     }
 
     void beginContact(PUIO* puio, const b2Vec2& point, const b2Fixture& fixture) override {
+        colorScheme_ = theme::base::all.sel;
     }
 
     void endContact(PUIO* puio, const b2Vec2& point, const b2Fixture& fixture) override {
+        colorScheme_ = theme::base::all.def;
     }
 
 private:

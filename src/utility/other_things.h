@@ -5,6 +5,10 @@
 #include "P_P_M.h"
 #include "math_things.h"
 #include <libs/Box2D/Common/b2Math.h>
+#include <libs/Box2D/Collision/Shapes/b2Shape.h>
+#include <libs/Box2D/Dynamics/b2Body.h>
+#include <libs/Box2D/Collision/Shapes/b2CircleShape.h>
+#include <libs/Box2D/Collision/Shapes/b2PolygonShape.h>
 
 
 namespace other_things {
@@ -117,6 +121,52 @@ return instance;}
         float full_len = std::sqrt((module.x * module.x) + (module.y * module.y));
         return {(module.x * (speed / full_len)),
                 (module.y * (speed / full_len))};
+    }
+
+    pt::Circle<int> toCirce(const b2Body* body, const b2CircleShape* circleShape) {
+        b2Vec2 new_center;
+        if(circleShape->m_p.x == 0.0f && circleShape->m_p.y == 0.0f) {
+            new_center = body->GetPosition();
+        } else {
+            float angle = other_things::angle(circleShape->m_p);
+            angle += body->GetAngle();
+            new_center = other_things::rotateb2Vec2(
+                    angle,
+                    other_things::radius(circleShape->m_p)
+            );
+            new_center += body->GetPosition();
+        }
+        return other_things::toCircle(
+                new_center,
+                circleShape->m_radius,
+                body->GetAngle()
+        );
+    }
+
+    pt::Polygon<int> toPolygon(const b2Body* body, const b2PolygonShape* polygonShape) {
+        pt::Polygon<int> polygon;
+        if(polygonShape->m_centroid.x == 0.0f && polygonShape->m_centroid.y == 0.0f) {
+            polygon = other_things::toPolygon(
+                    body->GetPosition(),
+                    polygonShape->m_vertices,
+                    polygonShape->m_count,
+                    body->GetAngle()
+            );
+        } else {
+            float angle = other_things::angle(polygonShape->m_centroid) + body->GetAngle();
+            b2Vec2 new_center = other_things::rotateb2Vec2(
+                    angle,
+                    other_things::radius(polygonShape->m_centroid)
+            );
+
+            polygon = other_things::toPolygon(
+                    new_center,
+                    polygonShape->m_vertices,
+                    polygonShape->m_count,
+                    body->GetAngle()
+            );
+        }
+        return polygon;
     }
 }
 #endif //TESTC_OTHER_THINGS_H

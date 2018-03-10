@@ -10,14 +10,14 @@ public:
     ExitDoor(const std::string &id, box2d::WorldWrapper &world, b2BodyDef &bodyDef, EntityCategory entityCategory)
             : PUIO(id, world, bodyDef, entityCategory) {}
 
-    void beginContact(PUIO *puio) override {
+    void beginContact(PUIO *puio, const b2Vec2 &point, const b2Fixture &fixture) override {
         if(puio->getEntityCategory() == EntityCategory::PLAYER) {
             notify(Signal{this, STATE::END_GAME, nullptr});
         }
     }
 
-    void endContact(PUIO *puio) override {
-
+    void endContact(PUIO *puio, const b2Vec2 &point, const b2Fixture &fixture) override {
+        PUIO::endContact(puio, point, fixture);
     }
 };
 

@@ -7,6 +7,7 @@
 #include <vector>
 #include <functional>
 #include <EventManager.h>
+#include <Animation.h>
 
 class Player : public PUIO {
 public:
@@ -21,7 +22,8 @@ public:
             fixtures.emplace_back(fixture);
         }
         void remove(const b2Fixture& fixture) {
-            fixtures.erase(std::remove_if(fixtures.begin(), fixtures.end(), [&fixture](const b2Fixture& f){
+            fixtures.erase(std::remove_if(fixtures.begin(), fixtures.end(),
+                                          [&fixture](const b2Fixture& f){
                 return &f == &fixture;
             }), fixtures.end());
         }
@@ -84,16 +86,16 @@ public:
         if(!floor_contact_.onGround()) {
             switch (direction()) {
                 case DIRECTION::LEFT:
-                    addForce(b2Vec2{-properties_.move_force-1.0f, 0.0f});
+                    addForce(b2Vec2{-properties_.move_force-1.5f, 0.0f});
                     break;
                 case DIRECTION::RIGHT:
-                    addForce(b2Vec2{properties_.move_force-1.0f, 0.0f});
+                    addForce(b2Vec2{properties_.move_force-1.5f, 0.0f});
                     break;
                 case DIRECTION::LEFT_UP:
-                    addForce(b2Vec2{-properties_.move_force-1.0f, 0.0f});
+                    addForce(b2Vec2{-properties_.move_force-1.5f, 0.0f});
                     break;
                 case DIRECTION::RIGHT_UP:
-                    addForce(b2Vec2{properties_.move_force-1.0f, 0.0f});
+                    addForce(b2Vec2{properties_.move_force-1.5f, 0.0f});
                     break;
                 case DIRECTION::STOP:
                     addForce(b2Vec2{0.0f, 0.0f});
@@ -110,7 +112,7 @@ public:
                 addVelocity(b2Vec2{0.0f, properties_.jump_force});
                 break;
             case DIRECTION::DOWN:
-                addVelocity(b2Vec2{0.0f, -properties_.jump_force});
+                //addVelocity(b2Vec2{0.0f, -properties_.jump_force});
                 break;
             case DIRECTION::LEFT:
                 addVelocity(b2Vec2{-properties_.move_force, 0.0f});
@@ -119,10 +121,10 @@ public:
                 addVelocity(b2Vec2{properties_.move_force, 0.0f});
                 break;
             case DIRECTION::LEFT_UP:
-                addVelocity(b2Vec2{-properties_.jump_force/3.0f, properties_.jump_force});
+                addVelocity(b2Vec2{-properties_.jump_force/6.0f, properties_.jump_force});
                 break;
             case DIRECTION::RIGHT_UP:
-                addVelocity(b2Vec2{properties_.jump_force/3.0f, properties_.jump_force});
+                addVelocity(b2Vec2{properties_.jump_force/6.0f, properties_.jump_force});
                 break;
             case DIRECTION::STOP:
                 addVelocity(b2Vec2{0.0f, 0.0f});
@@ -133,8 +135,8 @@ public:
     }
 
     void beginContact(PUIO *puio, const b2Vec2& point, const b2Fixture& fixture) override {
-        if(puio->getEntityCategory() == EntityCategory::FLOOR && body_->GetPosition().y > point.y) {
-            SDL_Log("begin contact to the floor");
+        if(puio->getEntityCategory() == EntityCategory::FLOOR
+           && (body_->GetPosition().y - 0.25) > point.y) {
             floor_contact_.add(fixture);
         }
         if(puio->getEntityCategory() == EntityCategory::EXIT) {
@@ -144,9 +146,13 @@ public:
 
     void endContact(PUIO *puio, const b2Vec2& point, const b2Fixture& fixture) override {
         if(puio->getEntityCategory() == EntityCategory::FLOOR) {
-            SDL_Log("end contact to the floor");
             floor_contact_.remove(fixture);
         }
+    }
+
+public:
+    void draw() override {
+        PUIO::draw();
     }
 
 private:

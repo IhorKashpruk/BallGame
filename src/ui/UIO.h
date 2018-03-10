@@ -3,19 +3,23 @@
 
 #include <theme_properties.h>
 #include <Draftsman.h>
+#include <Animation.h>
 #include "AUIO.h"
 #include "Draftsman.h"
 
+
 template <template <class> class Shape>
-class UIO : public AUIO {
+class UIO : public AUIO, public LinearAnimation<Shape<int>, 10, false> {
     typedef int T;
     typedef pt::point<T> Point;
 public:
     explicit UIO(std::string id, const Shape<T>& shape)
             : AUIO(std::move(id)),
+              LinearAnimation<Shape<int>, 10, false>(100),
               shape_(shape) {}
     explicit UIO(std::string id, Shape<T>&& shape)
             : AUIO(std::move(id)),
+              LinearAnimation<Shape<int>, 10, false>(100),
               shape_(shape) {}
 
     virtual ~UIO() {
@@ -27,6 +31,7 @@ public:
         if(colorScheme_ == theme::base::all.clk) {
             colorScheme_ = theme::base::all.sel;
         }
+        LinearAnimation<Shape<int>, 10, false>::animate();
     }
 
     void draw(const Point& offset) override {
@@ -63,6 +68,11 @@ public:
 
     float angle() const override {
         return shape_.angle;
+    }
+
+protected:
+    void drawAnimation() override {
+        LinearAnimation<Shape<int>, 10, false>::animateShape(shape_, theme::base::all.def);
     }
 
 protected:

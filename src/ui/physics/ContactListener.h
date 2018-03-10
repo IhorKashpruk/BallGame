@@ -20,27 +20,12 @@ namespace box2d {
             PUIO* puio1 = static_cast<PUIO*>(bodyUserDataA);
             PUIO* puio2 = static_cast<PUIO*>(bodyUserDataB);
             contact->GetWorldManifold(&worldManifold);
-            puio1->beginContact(puio2, worldManifold.points[0], *contact->GetFixtureB());
-            puio2->beginContact(puio1, worldManifold.points[0], *contact->GetFixtureA());
-//            if(contact->GetFixtureA()->IsSensor()) {
-//                IInfluential *influential = static_cast<IInfluential*>(bodyUserDataA);
-//                influential->add(puio2);
-//            }
-//
-//            if(contact->GetFixtureB()->IsSensor()) {
-//                AInfluential *influential = static_cast<AInfluential*>(bodyUserDataB);
-//                influential->add(puio1);
-//            }
-//
-//            // Check if ball on the ground
-//            if(puio1->getEntityCategory() == EntityCategory::PLAYER && puio2->getEntityCategory() == EntityCategory::FLOOR) {
-//                Ball* ball = static_cast<Ball*>(puio1);
-//                ball->onGround(true);
-//            }
-//            if(puio2->getEntityCategory() == EntityCategory::PLAYER && puio1->getEntityCategory() == EntityCategory::FLOOR) {
-//                Ball* ball = static_cast<Ball*>(puio2);
-//                ball->onGround(true);
-//            }
+
+            // Find the contact point
+            b2Vec2 point = getContactPoint(contact);
+
+            puio1->beginContact(puio2, point, *contact->GetFixtureB());
+            puio2->beginContact(puio1, point, *contact->GetFixtureA());
         }
 
         void EndContact(b2Contact* contact) override {
@@ -52,34 +37,30 @@ namespace box2d {
 
             PUIO* puio1 = static_cast<PUIO*>(bodyUserDataA);
             PUIO* puio2 = static_cast<PUIO*>(bodyUserDataB);
-
             contact->GetWorldManifold(&worldManifold);
-            puio1->endContact(puio2, worldManifold.points[0], *contact->GetFixtureB());
-            puio2->endContact(puio1, worldManifold.points[0], *contact->GetFixtureA());
-//
-//            if(contact->GetFixtureA()->IsSensor()) {
-//                IInfluential *influential = static_cast<IInfluential*>(bodyUserDataA);
-//                influential->remove(puio2);
-//            }
-//
-//            if(contact->GetFixtureB()->IsSensor()) {
-//                AInfluential *influential = static_cast<AInfluential*>(bodyUserDataB);
-//                influential->remove(puio1);
-//            }
-//
-//            // Check if ball on the ground
-//            if(puio1->getEntityCategory() == EntityCategory::PLAYER && puio2->getEntityCategory() == EntityCategory::FLOOR) {
-//                Ball* ball = static_cast<Ball*>(puio1);
-//                ball->onGround(false);
-//            }
-//            if(puio2->getEntityCategory() == EntityCategory::PLAYER && puio1->getEntityCategory() == EntityCategory::FLOOR) {
-//                Ball* ball = static_cast<Ball*>(puio2);
-//                ball->onGround(false);
-//            }
+
+            // Find the contact point
+            b2Vec2 point = getContactPoint(contact);
+
+            puio1->endContact(puio2, point, *contact->GetFixtureB());
+            puio2->endContact(puio1, point, *contact->GetFixtureA());
         }
 
     private:
         b2WorldManifold worldManifold;
+
+        b2Vec2 calculateContactPoint(const b2Vec2& p1, const b2Vec2& p2) {
+            return {(worldManifold.points[0].x + worldManifold.points[1].x)/2.0f,
+                    (worldManifold.points[0].y + worldManifold.points[1].y)/2.0f};
+        }
+
+        b2Vec2 getContactPoint(b2Contact* contact) {
+            b2Vec2 point = worldManifold.points[0];
+            if(contact->GetManifold()->pointCount == 2) {
+                point = calculateContactPoint(worldManifold.points[0], worldManifold.points[1]);
+            }
+            return point;
+        }
     };
 }
 

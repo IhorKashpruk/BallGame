@@ -51,7 +51,6 @@ set(SOURCE_FILES main.cpp
         src/ui/physics/WorldUIO.h
         src/ui/logic/Camera.h
         src/ui/logic/WorldLogic.h
-        src/ui/physics/Ball.h
         src/ui/logic/AfterGameLogic.h
         src/JsonReader.h
         src/LevelManager.h
@@ -62,7 +61,12 @@ set(SOURCE_FILES main.cpp
         src/ui/interfaces/IText.h
         src/ui/physics/Influential.h
         src/ui/physics/InfluentialPUIO.h
-        src/ui/physics/ContactListener.h src/EventManager.h src/ui/physics/ExitDoor.h src/ui/interfaces/IContactResponder.h src/ui/physics/Player.h)
+        src/ui/physics/ContactListener.h
+        src/EventManager.h
+        src/ui/physics/ExitDoor.h
+        src/ui/interfaces/IContactResponder.h
+        src/ui/physics/Player.h
+        src/Animation.h)
 
 include_directories(src)
 include_directories(src/libs)

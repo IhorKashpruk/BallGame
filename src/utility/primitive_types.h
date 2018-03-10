@@ -11,6 +11,9 @@ namespace pt {
     template<typename T = int>
     struct size {
         T w, h;
+        size<T> operator+(const size& l) {
+            return size<T> { w + l.w, h + l.h};
+        }
     };
 
     template<typename T = int>
