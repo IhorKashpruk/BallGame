@@ -19,6 +19,18 @@ namespace pt {
     template<typename T = int>
     struct point {
         T x, y;
+        point<T> operator+(const point<T>& p) {
+            return { x + p.x, y + p.y };
+        }
+        point<T> operator-(const point<T>& p) {
+            return { x - p.x, y - p.y };
+        }
+        point<T> operator*(const point<T>& p) {
+            return { x * p.x, y + p.y };
+        }
+        point<T> operator/(const point<T>& p) {
+            return { x / p.x, y / p.y };
+        }
     };
 
     template<class T>
@@ -139,6 +151,23 @@ namespace pt {
     }
     bool under(Polygon<int>&& polygon, point<int>&& point) {
         return under(polygon, point);
+    }
+
+    void move(Circle<int>& circle, const point<int>& point) {
+        circle.center.x += (point.x - (circle.radius + circle.center.x));
+        circle.center.y += (point.y - (circle.radius + circle.center.y));
+    }
+
+    void move(Rectangle<int>& rectangle, const point<int>& point) {
+        rectangle.center.x += (point.x - (rectangle.size_.w + rectangle.center.x));
+        rectangle.center.y += (point.y - (rectangle.size_.h + rectangle.center.y));
+    }
+
+    bool under(const Rectangle<int>& rec1, const Rectangle<int>& rec2) {
+        return !(((rec1.center.x + rec1.size_.w) > (rec2.center.x - rec2.size_.w))
+                 || ((rec1.center.x - rec1.size_.w) > (rec2.center.x + rec2.size_.w))
+                 || ((rec1.center.y - rec1.size_.h) > (rec2.center.y + rec2.size_.h))
+                 || ((rec1.center.y + rec1.size_.h) > (rec2.center.y - rec2.size_.h)));
     }
 
     template <class from, class to>

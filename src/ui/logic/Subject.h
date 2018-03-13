@@ -3,11 +3,12 @@
 
 #include <vector>
 #include <algorithm>
+#include <SDL2/SDL_log.h>
 #include "IObserver.h"
 
 class Subject {
 public:
-    void attach(IObserver* o) { observers_.push_back(o);}
+    void attach(IObserver* o) { observers_.push_back(o); }
     void detach(IObserver* o) {
         observers_.erase(
                 std::remove(observers_.begin(), observers_.end(), o),

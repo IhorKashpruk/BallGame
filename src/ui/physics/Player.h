@@ -83,6 +83,9 @@ public:
 
     void update() override {
         PUIO::update();
+        // Send signal to camera
+        notify(Signal(this, STATE::VALUE_CHANGED, other_things::toPoint(body_->GetPosition())));
+
         if(!floor_contact_.onGround()) {
             switch (direction()) {
                 case DIRECTION::LEFT:

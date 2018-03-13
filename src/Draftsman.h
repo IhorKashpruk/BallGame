@@ -224,9 +224,9 @@ private:
             PRINT_ERROR("IMG_Init", IMG_GetError());
             return false;
         }
-        SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, "1" );
+        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
         SDL_initFramerate(&fps_manager);
-        SDL_setFramerate(&fps_manager, 30);
+        SDL_setFramerate(&fps_manager, window::fps);
         return true;
     }
 

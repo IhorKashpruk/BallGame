@@ -85,7 +85,6 @@ public:
     }
 
     void draw() override {
-        update();
         for(auto& uio: uios_) {
             uio->draw();
         }

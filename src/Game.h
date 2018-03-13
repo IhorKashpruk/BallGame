@@ -21,6 +21,7 @@ public:
         while(!isDone_) {
             Draftsman::getInstance().clearAndSetBaseColor();
             if(auto spt = ContextManager::getInstance().getCurrentContext().lock()){
+                spt->update();
                 spt->draw();
             }
             Draftsman::getInstance().draw();

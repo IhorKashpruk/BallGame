@@ -262,6 +262,7 @@ namespace factory {
     Player* get<Player>(json& j, WorldUIO<WorldLogic, pt::Rectangle>& context) {
         Player* player = new Player(j["id"], *context.getWorld(), j["body_def"], j["properties"], j["category"]);
         addFixture(j["shapes"], player);
+        player->attach((IObserver*)context.getCamera());
         return player;
     }
 

@@ -31,7 +31,7 @@ public:
               box2d::PO(world, bodyDef),
               IContactResponder(),
               entityCategory_(entityCategory) {
-        setUserData((PUIO*)this);
+        setUserData(this);
     }
     explicit PUIO(std::string&& id,
                    box2d::WorldWrapper& world,
@@ -41,7 +41,7 @@ public:
               box2d::PO(world, bodyDef),
               IContactResponder(),
               entityCategory_(entityCategory) {
-        setUserData((PUIO*)this);
+        setUserData(this);
     }
 
     virtual ~PUIO() {
@@ -58,6 +58,18 @@ public:
 
     bool under(const Point &point) override {
         return false;
+    }
+
+    bool under(const pt::Circle<int> &circle) const override {
+        return true;
+    }
+
+    bool under(const pt::Rectangle<int> &rectangle) const override {
+        return true;
+    }
+
+    bool under(const pt::Polygon<int> &polygon) const override {
+        return true;
     }
 
     Point center() const override {

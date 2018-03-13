@@ -105,6 +105,18 @@ public:
         return false;
     }
 
+    bool under(const pt::Circle<int> &circle) const override {
+        return true;
+    }
+
+    bool under(const pt::Rectangle<int> &rectangle) const override {
+        return true;
+    }
+
+    bool under(const pt::Polygon<int> &polygon) const override {
+        return true;
+    }
+
     Point center() const override {
         return {};
     }

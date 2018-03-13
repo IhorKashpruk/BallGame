@@ -19,7 +19,6 @@ namespace box2d {
 
         void setUserData(void* data) {
             if(body_) {
-                SDL_Log("Set user data");
                 body_->SetUserData(data);
             }
         }

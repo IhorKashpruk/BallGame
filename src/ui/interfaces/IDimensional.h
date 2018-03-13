@@ -9,6 +9,9 @@ class IDimensional {
 public:
     virtual bool under(Point&& point) = 0;
     virtual bool under(const Point& point) = 0;
+    virtual bool under(const pt::Circle<int>& circle) const = 0;
+    virtual bool under(const pt::Rectangle<int>& rectangle) const = 0;
+    virtual bool under(const pt::Polygon<int>& polygon) const = 0;
     virtual Point center() const = 0;
     virtual float angle() const = 0;
     virtual ~IDimensional() = default;
