@@ -14,6 +14,7 @@ public:
     struct properties {
         float move_force;
         float jump_force;
+        float radius;
     };
 
     struct floor_contact {
@@ -42,22 +43,24 @@ public:
         NONE
     };
     explicit Player(std::string&& id,
-                  box2d::WorldWrapper& world,
-                  b2BodyDef& bodyDef,
-                  const properties& prop,
-                  EntityCategory entityCategory) :
-            PUIO(std::move(id), world, bodyDef, entityCategory),
+                    box2d::WorldWrapper& world,
+                    b2BodyDef& bodyDef,
+                    b2FixtureDef fixDef,
+                    const properties& prop) :
+            PUIO(std::move(id), world, bodyDef, EntityCategory::PLAYER),
             properties_(prop){
         setUserData(this);
+        createBase(fixDef, prop.radius);
     }
     explicit Player(std::string&& id,
-                  box2d::WorldWrapper& world,
-                  b2BodyDef&& bodyDef,
-                  properties&& prop,
-                  EntityCategory entityCategory) :
-            PUIO(std::move(id), world, bodyDef, entityCategory),
+                    box2d::WorldWrapper& world,
+                    b2BodyDef&& bodyDef,
+                    b2FixtureDef fixDef,
+                    properties&& prop) :
+            PUIO(std::move(id), world, bodyDef, EntityCategory::PLAYER),
             properties_(prop) {
         setUserData(this);
+        createBase(fixDef, prop.radius);
     }
     ~Player() override = default;
 
@@ -73,7 +76,7 @@ public:
         PUIO::body_->SetLinearVelocity(velocity);
     }
 
-    pt::Circle<int> shape() {
+    pt::Circle shape() {
         return other_things::toCircle(
                 body_->GetPosition(),
                 body_->GetFixtureList()[0].GetShape()->m_radius,
@@ -89,13 +92,13 @@ public:
         if(!floor_contact_.onGround()) {
             switch (direction()) {
                 case DIRECTION::LEFT:
-                    addForce(b2Vec2{-properties_.move_force-1.5f, 0.0f});
+                    addForce(b2Vec2{-(properties_.move_force-1.5f), 0.0f});
                     break;
                 case DIRECTION::RIGHT:
                     addForce(b2Vec2{properties_.move_force-1.5f, 0.0f});
                     break;
                 case DIRECTION::LEFT_UP:
-                    addForce(b2Vec2{-properties_.move_force-1.5f, 0.0f});
+                    addForce(b2Vec2{-(properties_.move_force-1.5f), 0.0f});
                     break;
                 case DIRECTION::RIGHT_UP:
                     addForce(b2Vec2{properties_.move_force-1.5f, 0.0f});
@@ -124,7 +127,7 @@ public:
                 addVelocity(b2Vec2{properties_.move_force, 0.0f});
                 break;
             case DIRECTION::LEFT_UP:
-                addVelocity(b2Vec2{-properties_.jump_force/6.0f, properties_.jump_force});
+                addVelocity(b2Vec2{-(properties_.jump_force/6.0f), properties_.jump_force});
                 break;
             case DIRECTION::RIGHT_UP:
                 addVelocity(b2Vec2{properties_.jump_force/6.0f, properties_.jump_force});
@@ -137,9 +140,9 @@ public:
         };
     }
 
-    void beginContact(PUIO *puio, const b2Vec2& point, const b2Fixture& fixture) override {
+    void beginContact(PUIO* puio, const b2Vec2& point, const b2Fixture& fixture) override {
         if(puio->getEntityCategory() == EntityCategory::FLOOR
-           && (body_->GetPosition().y - 0.25) > point.y) {
+           && (body_->GetPosition().y - 0.1) > point.y) {
             floor_contact_.add(fixture);
         }
         if(puio->getEntityCategory() == EntityCategory::EXIT) {
@@ -147,7 +150,7 @@ public:
         }
     }
 
-    void endContact(PUIO *puio, const b2Vec2& point, const b2Fixture& fixture) override {
+    void endContact(PUIO* puio, const b2Vec2& point, const b2Fixture& fixture) override {
         if(puio->getEntityCategory() == EntityCategory::FLOOR) {
             floor_contact_.remove(fixture);
         }
@@ -156,6 +159,17 @@ public:
 public:
     void draw() override {
         PUIO::draw();
+        pt::Circle circle = shape();
+        circle.radius += -1;
+        Draftsman::getInstance().draw(circle, colorScheme_);
+    }
+
+    void draw(const pt::point& offset) override {
+        PUIO::draw(offset);
+        pt::Circle circle = shape();
+        circle.radius += -1;
+        circle.center = circle.center + offset;
+        Draftsman::getInstance().draw(circle, colorScheme_);
     }
 
 private:
@@ -164,8 +178,10 @@ private:
 
     typename Player::DIRECTION direction() {
 #define KEY_DOWN(key) EventManager::getInstance().keyIsDown(key)
-        if(KEY_DOWN("Up") && KEY_DOWN("Left"))  { return DIRECTION::LEFT_UP; }
-        if(KEY_DOWN("Up") && KEY_DOWN("Right")) { return DIRECTION::RIGHT_UP; }
+        if(KEY_DOWN("Up") && KEY_DOWN("Left"))      { return DIRECTION::LEFT_UP; }
+        if(KEY_DOWN("Up") && KEY_DOWN("Right"))     { return DIRECTION::RIGHT_UP; }
+        if(KEY_DOWN("Down") && KEY_DOWN("Right"))   { return DIRECTION::RIGHT; }
+        if(KEY_DOWN("Down") && KEY_DOWN("Left"))    { return DIRECTION::LEFT; }
         if(KEY_DOWN("Up"))      { return DIRECTION::UP; }
         if(KEY_DOWN("Down"))    { return DIRECTION::DOWN; }
         if(KEY_DOWN("Left"))    { return DIRECTION::LEFT; }
@@ -173,6 +189,12 @@ private:
         if(KEY_DOWN("Space"))   { return DIRECTION::STOP; }
         return DIRECTION::NONE;
 #undef KEY_DOWN
+    }
+
+    void createBase(b2FixtureDef& fixDef, float radius) {
+        b2CircleShape circleShape = box2d::WorldWrapper::createCircleShape({0.0f, 0.0f}, radius);
+        fixDef.shape = &circleShape;
+        createFixture(fixDef);
     }
 };
 

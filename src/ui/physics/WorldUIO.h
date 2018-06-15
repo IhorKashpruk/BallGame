@@ -9,24 +9,22 @@
 #include "WorldWrapper.h"
 #include "ContactListener.h"
 
-template <class Logic, template <class> class Shape>
+template <class Logic, class Shape>
 class WorldUIO : public ModernContext<Logic>, public UIO<Shape> {
-    typedef int T;
-    typedef pt::point<T> Point;
     typedef std::unique_ptr<box2d::WorldWrapper> world_ui_ptr;
     typedef std::unique_ptr<RectangleCamera> camera_ptr;
 public:
-    explicit WorldUIO(std::string id, const Shape<T>& shape, box2d::WorldWrapper::properties& prop)
+    explicit WorldUIO(std::string id, const Shape& shape, box2d::WorldWrapper::properties& prop)
             : ModernContext<Logic>(),
               UIO<Shape>(std::move(id), shape),
               world_(new box2d::WorldWrapper(prop)) {
-        camera_.reset(new RectangleCamera(shape, pt::Rectangle<int>({}, 0, {200,200}), shape.center));
+        camera_.reset(new RectangleCamera(pt::Rectangle({}, 0, {100,100}), shape.center));
     }
-    explicit WorldUIO(std::string id, const Shape<T>& shape)
+    explicit WorldUIO(std::string id, const Shape& shape)
             : ModernContext<Logic>(),
               UIO<Shape>(std::move(id), shape),
               world_(nullptr) {
-        camera_.reset(new RectangleCamera(shape, pt::Rectangle<int>({}, 0, {200,200}), shape.center));
+        camera_.reset(new RectangleCamera(pt::Rectangle({}, 0, {100,100}), shape.center));
     }
 
     virtual ~WorldUIO() {
@@ -43,15 +41,22 @@ public:
 
     void draw() override {
         if (world_) {
-            ModernContext<Logic>::draw();
+            SDL_Log("offset: %d", camera_->getOffset().x);
+            ModernContext<Logic>::draw(camera_->getOffset());
         }
         Draftsman::getInstance().draw(UIO<Shape>::shape_, UIO<Shape>::colorScheme_);
         if(UIO<Shape>::colorScheme_ == theme::base::all.clk) {
             UIO<Shape>::colorScheme_ = theme::base::all.sel;
         }
     }
-    void draw(const Point& offset) override {
-
+    void draw(const pt::point& offset) override {
+        if (world_) {
+            ModernContext<Logic>::draw(offset);
+        }
+        Draftsman::getInstance().draw(UIO<Shape>::shape_, UIO<Shape>::colorScheme_);
+        if(UIO<Shape>::colorScheme_ == theme::base::all.clk) {
+            UIO<Shape>::colorScheme_ = theme::base::all.sel;
+        }
     }
 
     box2d::WorldWrapper* getWorld() {

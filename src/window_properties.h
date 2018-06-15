@@ -5,7 +5,7 @@
 
 namespace window {
     constexpr static char* title = (char *const) "Game";
-    constexpr static pt::size<int> size {600, 600};
+    constexpr static pt::size size {600, 600};
     constexpr static int fps = 60;
 }
 

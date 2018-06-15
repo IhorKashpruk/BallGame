@@ -30,12 +30,11 @@ namespace level {
                             = dynamic_cast<WorldUIO<WorldLogic, pt::Rectangle> *>
                             (ContextManager::getInstance().get("game_context")->get("world_context"));
                     worldContext->removeAll();
-//                    worldContext->resetWorld(new box2d::WorldWrapper());
                     json j = JsonReader::get(levels[currentLevel_+1]);
                     factory::build(j, *worldContext);
                 }
             }
-            currentLevel_++;
+//            currentLevel_++;
         }
 
     private:

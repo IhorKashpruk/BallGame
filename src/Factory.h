@@ -10,75 +10,63 @@
 #include <ui/physics/InfluentialPUIO.h>
 #include <ui/physics/Influential.h>
 #include <ui/physics/Player.h>
+#include <ui/physics/ExitDoor.h>
 
 using json = nlohmann::json;
 
 // JSON convertation
 namespace pt {
 
-    template <class T>
-    void to_json(json& j, const point<T>& p) {
+    void to_json(json& j, const point& p) {
         j = json{{"x", p.x}, {"y", p.y}};
     }
 
-    template <class T>
-    void from_json(const json& j, point<T>& p) {
-        p.x = j.at("x").get<T>();
-        p.y = j.at("y").get<T>();
+    void from_json(const json& j, point& p) {
+        p.x = j.at("x").get<int>();
+        p.y = j.at("y").get<int>();
     }
 
-    template <class T>
-    void to_json(json& j, const size<T>& s) {
+    void to_json(json& j, const size& s) {
         j = json{{"w", s.w}, {"h", s.h}};
     }
 
-    template <class T>
-    void from_json(const json& j, size<T>& s) {
-        s.w = j.at("w").get<T>();
-        s.h = j.at("h").get<T>();
+    void from_json(const json& j, size& s) {
+        s.w = j.at("w").get<int>();
+        s.h = j.at("h").get<int>();
     }
 
-    template <class T>
-    void to_json(json& j, const Circle<T>& c) {
+    void to_json(json& j, const Circle& c) {
         j = json{{"center", c.center}, {"angle", c.angle}, {"radius", c.radius}};
     }
 
-    template <class T>
-    void from_json(const json& j, Circle<T>& c) {
-        c.center = j.at("center").get<point<T>>();
-        c.angle = j.at("angle").get<T>();
-        c.radius = j.at("radius").get<T>();
+    void from_json(const json& j, Circle& c) {
+        c.center = j.at("center").get<point>();
+        c.angle = j.at("angle").get<float>();
+        c.radius = j.at("radius").get<int>();
     }
 
-    template <class T>
-    void to_json(json& j, const Rectangle<T>& r) {
+    void to_json(json& j, const Rectangle& r) {
         j = json{{"center", r.center}, {"angle", r.angle}, {"size", r.size_}};
     }
 
-    template <class T>
-    void from_json(const json& j, Rectangle<T>& r) {
-        r.center = j.at("center").get<point<T>>();
-        r.angle = j.at("angle").get<T>();
-        r.size_ = j.at("size").get<size<T>>();
+    void from_json(const json& j, Rectangle& r) {
+        r.center = j.at("center").get<point>();
+        r.angle = j.at("angle").get<float>();
+        r.size_ = j.at("size").get<size>();
     }
 
-
-    template <class T>
-    void to_json(json& j, const Polygon<T>& p) {
+    void to_json(json& j, const Polygon& p) {
         j = json{{"center", p.center}, {"angle", p.angle}, {"points", p.points}};
     }
 
-    template <class T>
-    void from_json(const json& j, Polygon<T>& p) {
-        p.center = j.at("center").get<point<T>>();
-        p.angle = j.at("angle").get<T>();
+    void from_json(const json& j, Polygon& p) {
+        p.center = j.at("center").get<point>();
+        p.angle = j.at("angle").get<float>();
         for(const auto&it: j.at("points")) {
-            p.points.push_back({it.at("x").get<T>(), it.at("y").get<T>()});
+            p.points.push_back({it.at("x").get<int>(), it.at("y").get<int>()});
         }
     }
 }
-
-
 
 void to_json(json& j, const b2Vec2& vec2) {
     j = json{{"x", vec2.x}, {"y", vec2.y}};
@@ -164,6 +152,7 @@ void to_json(json& j, const Player::properties& properties) {
 void from_json(const json& j, Player::properties& properties) {
     properties.move_force = j.at("move_force").get<float>();
     properties.jump_force = j.at("jump_force").get<float>();
+    properties.radius = j.at("radius").get<float>();
 }
 
 // Windmill
@@ -258,11 +247,19 @@ namespace factory {
         addFixture(j["shapes"], puio);
         return puio;
     }
+
+    template <>
+    ExitDoor* get<ExitDoor>(json& j, WorldUIO<WorldLogic, pt::Rectangle>& context) {
+        ExitDoor* puio = new ExitDoor(j["id"], *context.getWorld(), j["body_def"]);
+        addFixture(j["shapes"], puio);
+        return puio;
+    }
+
     template <>
     Player* get<Player>(json& j, WorldUIO<WorldLogic, pt::Rectangle>& context) {
-        Player* player = new Player(j["id"], *context.getWorld(), j["body_def"], j["properties"], j["category"]);
-        addFixture(j["shapes"], player);
+        Player* player = new Player(j["id"], *context.getWorld(), j["body_def"], j["fixture_def"], j["properties"]);
         player->attach((IObserver*)context.getCamera());
+        context.getCamera()->setCenter(player->shape().center);
         return player;
     }
 
@@ -275,7 +272,7 @@ namespace factory {
 
     template <>
     Windmill* get<Windmill>(json& j, WorldUIO<WorldLogic, pt::Rectangle>& context) {
-        Windmill* windmill = new Windmill(j["id"], j["properties"], *context.getWorld(), j["blades"], j["holder"], j["motor"], j["category"]);
+        Windmill* windmill = new Windmill(j["id"], j["properties"], *context.getWorld(), j["blades"], j["holder"], j["motor"]);
         return windmill;
     }
 
@@ -296,6 +293,10 @@ namespace factory {
         }
         if(j["class"] == "influentialpuio<attractive>") {
             context.add(get<InfluentialPUIO<Attractive>>(j, context));
+        }
+        if(j["class"] == "exitdoor") {
+            context.add(get<ExitDoor>(j, context));
+            return;
         }
     }
 

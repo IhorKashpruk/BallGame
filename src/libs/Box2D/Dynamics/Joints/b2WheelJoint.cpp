@@ -105,7 +105,7 @@ void b2WheelJoint::InitVelocityConstraints(const b2SolverData& data)
 	b2Vec2 rB = b2Mul(qB, m_localAnchorB - m_localCenterB);
 	b2Vec2 d = cB + rB - cA - rA;
 
-	// Point to line constraint
+	// point to line constraint
 	{
 		m_ay = b2Mul(qA, m_localYAxisA);
 		m_sAy = b2Cross(d + rA, m_ay);

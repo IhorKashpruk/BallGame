@@ -8,18 +8,16 @@
 #include "Draftsman.h"
 
 
-template <template <class> class Shape>
-class UIO : public AUIO, public LinearAnimation<Shape<int>, 10, false> {
-    typedef int T;
-    typedef pt::point<T> Point;
+template <class Shape>
+class UIO : public AUIO, public LinearAnimation<Shape, 4, false> {
 public:
-    explicit UIO(std::string id, const Shape<T>& shape)
+    explicit UIO(std::string id, const Shape& shape)
             : AUIO(std::move(id)),
-              LinearAnimation<Shape<int>, 10, false>(100),
+              LinearAnimation<Shape, 4, false>(100),
               shape_(shape) {}
-    explicit UIO(std::string id, Shape<T>&& shape)
+    explicit UIO(std::string id, Shape&& shape)
             : AUIO(std::move(id)),
-              LinearAnimation<Shape<int>, 10, false>(100),
+              LinearAnimation<Shape, 4, false>(100),
               shape_(shape) {}
 
     virtual ~UIO() {
@@ -31,50 +29,50 @@ public:
         if(colorScheme_ == theme::base::all.clk) {
             colorScheme_ = theme::base::all.sel;
         }
-        LinearAnimation<Shape<int>, 10, false>::animate();
+        LinearAnimation<Shape, 4, false>::animate();
     }
 
-    void draw(const Point& offset) override {
+    void draw(const pt::point& offset) override {
 
     }
 
-    void clickLeftButton(const Point& point) override {
-        notify(Signal{this, STATE::LEFT_BUTTON_CLICK, point});
+    void clickLeftButton(const pt::point& p) override {
+        notify(Signal{this, STATE::LEFT_BUTTON_CLICK, p});
     }
 
-    void clickRightButton(const Point& point) override {
-        notify(Signal{this, STATE::RIGHT_BUTTON_CLICK, point});
+    void clickRightButton(const pt::point& p) override {
+        notify(Signal{this, STATE::RIGHT_BUTTON_CLICK, p});
     }
 
     void enterKey(const char* key) override {
         notify(Signal{this, STATE::ENTER_KEY, key});
     }
 
-    void mouseMove(const Point& point) override {
+    void mouseMove(const pt::point& point) override {
         notify(Signal{this, STATE::MOUSE_MOVE, point});
     }
 
-    bool under(Point&& point) override {
-        return pt::under(shape_, point);
+    bool under(pt::point&& p) override {
+        return pt::under(shape_, p);
     }
 
-    bool under(const Point& point) override {
-        return pt::under(shape_, point);
+    bool under(const pt::point& p) override {
+        return pt::under(shape_, p);
     }
 
-    bool under(const pt::Circle<int> &circle) const override {
+    bool under(const pt::Circle &circle) const override {
         return true;
     }
 
-    bool under(const pt::Rectangle<int> &rectangle) const override {
+    bool under(const pt::Rectangle &rectangle) const override {
         return true;
     }
 
-    bool under(const pt::Polygon<int> &polygon) const override {
+    bool under(const pt::Polygon &polygon) const override {
         return true;
     }
 
-    Point center() const override {
+    pt::point center() const override {
         return shape_.center;
     }
 
@@ -84,11 +82,11 @@ public:
 
 protected:
     void drawAnimation() override {
-        LinearAnimation<Shape<int>, 10, false>::animateShape(shape_, theme::base::all.def);
+        LinearAnimation<Shape, 4, false>::animateShape(shape_, theme::base::all.def);
     }
 
 protected:
-    Shape<T> shape_;
+    Shape shape_;
 };
 
 #endif //TESTC_UIO_H

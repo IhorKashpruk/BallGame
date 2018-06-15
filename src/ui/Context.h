@@ -15,8 +15,6 @@ class Context : public IDrawable, public AChecker {
     typedef std::shared_ptr<AUIO> uio_sh_ptr;
     typedef std::vector<uio_sh_ptr> vec_uio_ptr;
     typedef std::unique_ptr<AContextLogic> logic_un_ptr;
-    typedef int T;
-    typedef pt::point<T> Point;
 public:
     Context() : AChecker() {}
     virtual ~Context() {
@@ -90,14 +88,14 @@ public:
         }
     }
 
-    void draw(const Point &offset) override {
+    void draw(const pt::point& offset) override {
         update();
         for(auto& uio: uios_) {
             uio->draw(offset);
         }
     }
 
-    void check(const EVENT &event, const Point &point) {
+    void check(const EVENT &event, const pt::point &point) {
         CONTEXT_EVENT specEventType;
         AUIO* tmp = getUnder(point);
         if(tmp == nullptr) {
@@ -131,14 +129,14 @@ public:
     }
 
 private:
-    AUIO* getUnder(const Point& point) {
+    AUIO* getUnder(const pt::point& point) {
         for (auto &it: uios_) {
             if (it->under(point))
                 return &*it;
         }
         return nullptr;
     }
-    void displayEvent(const CONTEXT_EVENT& event, const Point& point, const char* key="") {
+    void displayEvent(const CONTEXT_EVENT& event, const pt::point& point, const char* key="") {
         switch (event) {
             case CONTEXT_EVENT::CLICK_LEFT_BUTTON:
                 selected_uio_->setColorScheme(theme::base::all.clk);

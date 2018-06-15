@@ -67,13 +67,11 @@ struct EventSimplifier {
 
 
 class AChecker {
-    typedef int T;
-    typedef pt::point<T> Point;
 public:
     virtual ~AChecker() = default;
 
 protected:
-    virtual void check(const EVENT& event, const Point& point) = 0;
+    virtual void check(const EVENT& event, const pt::point& point) = 0;
     virtual void check(const EVENT& event, const char* key) = 0;
     EventSimplifier& getPreviousEvent() { return previousEvent_; }
 private:

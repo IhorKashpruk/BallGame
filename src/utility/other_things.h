@@ -26,50 +26,24 @@ return instance;}
 #define PRINT_ERROR(function_name, error) \
     (SDL_Log("Error in function: '%s': %s.\n", function_name, error))
 
-
-    template <class from, class to>
-    pt::Circle<to> convert(const pt::Circle<from>& circle) {
-        return pt::convert(circle, &P_P_M_50::convert, &math_things::convert<to>);
-    }
-
-    template <class from, class to>
-    pt::Rectangle<to> convert(const pt::Rectangle<from>& rectangle) {
-        return pt::convert(rectangle, &P_P_M_50::convert, &math_things::convert<to>);
-    }
-
-    template <class from, class to>
-    pt::Polygon<to> convert(const pt::Polygon<from>& polygon) {
-        return pt::convert(polygon, &P_P_M_50::convert, &math_things::convert<to>);
-    }
-
-    template <class from, class to>
-    pt::point<to> convert(const pt::point<from>& point) {
-        return pt::convert(point, &P_P_M_50::convert);
-    }
-
-    template <class from, class to>
-    pt::point<to> convert(pt::point<from>&& point) {
-        return pt::convert(point, &P_P_M_50::convert);
-    }
-
-    pt::point<int> toPoint(const b2Vec2& center, bool m = false) {
+    pt::point toPoint(const b2Vec2& center, bool m = false) {
         return {P_P_M_50::convert(center.x), P_P_M_50::convert(center.y* (m ? 1.0f : -1.0f))};
     }
 
-    b2Vec2 toPoint(const pt::point<int>& point) {
+    b2Vec2 toPoint(const pt::point& point) {
         return {P_P_M_50::convert(point.x), P_P_M_50::convert(point.y * -1)};
     }
 
-    pt::Circle<int> toCircle(const b2Vec2& center, const float& radius, const float& angle) {
-        pt::Circle<int> ret;
+    pt::Circle toCircle(const b2Vec2& center, const float& radius, const float& angle) {
+        pt::Circle ret;
         ret.center = toPoint(center);
         ret.radius = P_P_M_50::convert(radius);
         ret.angle = RADIAN_TO_DEGREES(angle);
         return ret;
     }
 
-    pt::Circle<int> toCircle(b2Vec2&& center, const float& radius, const float& angle) {
-        pt::Circle<int> ret;
+    pt::Circle toCircle(b2Vec2&& center, const float& radius, const float& angle) {
+        pt::Circle ret;
         ret.center = toPoint(center);
         ret.radius = P_P_M_50::convert(radius);
         ret.angle = RADIAN_TO_DEGREES(angle);
@@ -83,8 +57,8 @@ return instance;}
         ret.y = std::sin(angle) * radius;
         return ret;
     }
-    pt::point<int> rotatePointInt(const float angle, const float radius) {
-        pt::point<int> ret;
+    pt::point rotatePointInt(const float angle, const float radius) {
+        pt::point ret;
         ret.x = (int)math_things::normalize(std::cos(angle) * radius);
         ret.y = (int)math_things::normalize(std::sin(angle) * radius);
         return ret;
@@ -103,8 +77,8 @@ return instance;}
     }
 
 
-    pt::Polygon<int> toPolygon(const b2Vec2& center, const b2Vec2* vec2, const int count, const float angle) {
-        pt::Polygon<int> polygon;
+    pt::Polygon toPolygon(const b2Vec2& center, const b2Vec2* vec2, const int count, const float angle) {
+        pt::Polygon polygon;
         polygon.center = {P_P_M_50::convert(center.x), P_P_M_50::convert(center.y*-1.0f)};
         polygon.angle = RADIAN_TO_DEGREES(angle);
         for(int i = 0; i < count; i++) {
@@ -123,7 +97,7 @@ return instance;}
                 (module.y * (speed / full_len))};
     }
 
-    pt::Circle<int> toCirce(const b2Body* body, const b2CircleShape* circleShape) {
+    pt::Circle toCirce(const b2Body* body, const b2CircleShape* circleShape) {
         b2Vec2 new_center;
         if(circleShape->m_p.x == 0.0f && circleShape->m_p.y == 0.0f) {
             new_center = body->GetPosition();
@@ -143,8 +117,8 @@ return instance;}
         );
     }
 
-    pt::Polygon<int> toPolygon(const b2Body* body, const b2PolygonShape* polygonShape) {
-        pt::Polygon<int> polygon;
+    pt::Polygon toPolygon(const b2Body* body, const b2PolygonShape* polygonShape) {
+        pt::Polygon polygon;
         if(polygonShape->m_centroid.x == 0.0f && polygonShape->m_centroid.y == 0.0f) {
             polygon = other_things::toPolygon(
                     body->GetPosition(),

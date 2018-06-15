@@ -5,18 +5,18 @@
 
 class ExitDoor : public PUIO {
 public:
-    ExitDoor(std::string &&id, box2d::WorldWrapper &world, b2BodyDef &&bodyDef, EntityCategory entityCategory)
-            : PUIO(id, world, bodyDef, entityCategory) {}
-    ExitDoor(const std::string &id, box2d::WorldWrapper &world, b2BodyDef &bodyDef, EntityCategory entityCategory)
-            : PUIO(id, world, bodyDef, entityCategory) {}
+    ExitDoor(std::string&& id, box2d::WorldWrapper& world, b2BodyDef&& bodyDef)
+            : PUIO(id, world, bodyDef, EntityCategory::EXIT) {}
+    ExitDoor(const std::string& id, box2d::WorldWrapper& world, b2BodyDef& bodyDef)
+            : PUIO(id, world, bodyDef, EntityCategory::EXIT) {}
 
-    void beginContact(PUIO *puio, const b2Vec2 &point, const b2Fixture &fixture) override {
+    void beginContact(PUIO *puio, const b2Vec2& point, const b2Fixture& fixture) override {
         if(puio->getEntityCategory() == EntityCategory::PLAYER) {
             notify(Signal{this, STATE::END_GAME, nullptr});
         }
     }
 
-    void endContact(PUIO *puio, const b2Vec2 &point, const b2Fixture &fixture) override {
+    void endContact(PUIO* puio, const b2Vec2& point, const b2Fixture& fixture) override {
         PUIO::endContact(puio, point, fixture);
     }
 };

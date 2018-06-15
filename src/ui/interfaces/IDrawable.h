@@ -4,11 +4,9 @@
 #include "../../utility/primitive_types.h"
 
 class IDrawable {
-    typedef int T;
-    typedef pt::point<T> Point;
 public:
     virtual void draw() = 0;
-    virtual void draw(const Point& offset) = 0;
+    virtual void draw(const pt::point& offset) = 0;
     virtual ~IDrawable() = default;
 };
 

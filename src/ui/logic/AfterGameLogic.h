@@ -11,7 +11,7 @@ public:
     explicit AfterGameLogic(Context* context) : AContextLogic(context) {}
 public:
     void update(const Signal& signal) override {
-        if(signal.getAUIO()->getID() == "restart_bt" && signal.getState() == STATE::LEFT_BUTTON_CLICK) {
+        if(signal.getAUIO()->getID() == "menu_bt" && signal.getState() == STATE::LEFT_BUTTON_CLICK) {
 //                IText* button = dynamic_cast<IText*>(context_->get("restart_bt"));
             ContextManager::getInstance().setCurrentContext("menu_context");
 

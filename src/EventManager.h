@@ -27,7 +27,7 @@ struct Event {
     DEVICE device;
     EVENT event;
     union {
-        const pt::point<int> point;
+        const pt::point point;
         const char* key;
     };
 };

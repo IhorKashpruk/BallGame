@@ -9,7 +9,7 @@ public:
 public:
     void update(const Signal& signal) override {
         if(signal.getState() == STATE::END_GAME) {
-            ContextManager::getInstance().setCurrentContext("menu_context");
+            ContextManager::getInstance().setCurrentContext("after_menu_context");
         }
     }
 };

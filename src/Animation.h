@@ -51,6 +51,7 @@ private:
 };
 
 // Animation for AUIO
+// Linear animation
 template <class Shape, int width, bool from_center>
 class LinearAnimation : public Animation {
 public:
@@ -58,10 +59,10 @@ public:
 };
 
 template <int width, bool from_center>
-class LinearAnimation<pt::Circle<int>, width, from_center> : public Animation {
+class LinearAnimation<pt::Circle, width, from_center> : public Animation {
 public:
-    LinearAnimation<pt::Circle<int>, width, from_center>(Uint32 steep) : Animation(steep) {}
-    void animateShape(pt::Circle<int>& circle, const ColorScheme& colorScheme) {
+    LinearAnimation<pt::Circle, width, from_center>(Uint32 steep) : Animation(steep) {}
+    void animateShape(pt::Circle& circle, const ColorScheme& colorScheme) {
         // Save previous radius
         int tmp_radius = circle.radius;
         // Change radius
@@ -88,15 +89,15 @@ private:
 };
 
 template <int width, bool from_center>
-int LinearAnimation<pt::Circle<int>, width, from_center>::radius_ {0};
+int LinearAnimation<pt::Circle, width, from_center>::radius_ {0};
 
 template <int width, bool from_center>
-class LinearAnimation<pt::Rectangle<int>, width, from_center> : public Animation {
+class LinearAnimation<pt::Rectangle, width, from_center> : public Animation {
 public:
-    LinearAnimation<pt::Rectangle<int>, width, from_center>(Uint32 steep) : Animation(steep) {}
-    void animateShape(pt::Rectangle<int>& rectangle, const ColorScheme& colorScheme) {
+    LinearAnimation<pt::Rectangle, width, from_center>(Uint32 steep) : Animation(steep) {}
+    void animateShape(pt::Rectangle& rectangle, const ColorScheme& colorScheme) {
         // Save previous size
-        pt::size<int> tmp_size = rectangle.size_;
+        pt::size tmp_size = rectangle.size_;
         // Change size
         rectangle.size_ = from_center ? size_ : (size_ + rectangle.size_);
         // Draw circle
@@ -117,10 +118,32 @@ public:
         size_.h = size_.h >= width ? 0 : size_.h + 1;
     }
 private:
-    static pt::size<int> size_;
+    static pt::size size_;
 };
 
 template <int width, bool from_center>
-pt::size<int> LinearAnimation<pt::Rectangle<int>, width, from_center>::size_ = {0,0};
+pt::size LinearAnimation<pt::Rectangle, width, from_center>::size_ = {0,0};
+
+// Impulse animation
+template <class Shape, int width>
+class ImpulseAnimation : public Animation {
+public:
+    explicit ImpulseAnimation(Uint32 steep) : Animation(steep) {}
+};
+
+template <int width>
+class ImpulseAnimation<pt::Rectangle, width> : public Animation {
+public:
+    explicit ImpulseAnimation(Uint32 steep) : Animation(steep) {}
+
+protected:
+    void drawAnimation() override {
+
+    }
+
+    void updateAnimation() override {
+
+    }
+};
 
 #endif //TESTC_ANIMATION_H

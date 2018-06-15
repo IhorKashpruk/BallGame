@@ -7,10 +7,8 @@
 #include <theme_properties.h>
 
 class Text : public IDrawable {
-    typedef int T;
-    typedef pt::point<T> Point;
 public:
-    explicit Text(std::string text, const Point& point, const float angle)
+    explicit Text(std::string text, const pt::point& point, const float angle)
             : IDrawable(), center_(point), angle_(angle) {
         reset(std::move(text));
     }
@@ -25,7 +23,7 @@ public:
         Draftsman::getInstance().draw(texture_, rect_, angle_);
     }
 
-    void draw(const Point &offset) override {
+    void draw(const pt::point &offset) override {
 
     }
 
@@ -56,7 +54,7 @@ private:
     SDL_Texture* texture_ = nullptr;
     std::string text_;
     SDL_Rect rect_;
-    Point center_;
+    pt::point center_;
     float angle_;
 };
 

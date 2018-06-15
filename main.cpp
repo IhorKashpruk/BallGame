@@ -11,7 +11,7 @@ using namespace std;
 void createBasicContext() {
     // Create after level menu
     auto* afterGameContext = new ModernIdentityContext<AfterGameLogic>("after_menu_context");
-    pt::Rectangle<int> button_size {{window::size.w/2, 100}, 0, {50, 15}};
+    pt::Rectangle button_size {{window::size.w/2, 100}, 0, {50, 15}};
     Button<>* restart_bt = new Button<>("restart_bt", button_size, "Restart");
     button_size.center.y += 50;
     Button<>* menu_bt = new Button<>("menu_bt", button_size, "Menu");
@@ -21,7 +21,7 @@ void createBasicContext() {
     auto* gameContext = new ModernIdentityContext<GameLogic>("game_context");
 
     // Create world context
-    pt::Rectangle<int> rectangle{{window::size.w/2, window::size.h/2}, 0, {window::size.w/2,window::size.h/2}};
+    pt::Rectangle rectangle{{window::size.w/2, window::size.h/2}, 0, {window::size.w/2,window::size.h/2}};
     auto* worldContext =
             new WorldUIO<WorldLogic, pt::Rectangle>("world_context", rectangle);
     gameContext->add(worldContext);

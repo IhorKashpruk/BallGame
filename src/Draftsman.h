@@ -39,7 +39,7 @@ public:
         SDL_framerateDelay(&fps_manager);
     }
 
-    inline void draw(const pt::Rectangle<int>& rectangle, const ColorScheme& colorScheme) {
+    inline void draw(const pt::Rectangle& rectangle, const ColorScheme& colorScheme) {
 
         if(rectangle.angle == 0 || rectangle.angle == 360) {
             rectangleRGBA(renderer,
@@ -65,13 +65,13 @@ public:
                               colorScheme.rim.a
                 );
             } else {
-                pt::point<int> p2[4] {
+                pt::point p2[4] {
                         {rectangle.size_.w, -rectangle.size_.h},
                         {-rectangle.size_.w, -rectangle.size_.h},
                         {-rectangle.size_.w, rectangle.size_.h},
                         {rectangle.size_.w, rectangle.size_.h}
                 };
-                pt::point<int> p[4];
+                pt::point p[4];
                 float angle;
                 for(int i = 0; i < 4; i++) {
                     angle = other_things::angle(p2[i]);
@@ -90,14 +90,14 @@ public:
         }
     }
 
-    inline void drawaaLine(const pt::point<int>& p1, const pt::point<int>& p2, const pt::point<int>& center, const SDL_Color& color) {
+    inline void drawaaLine(const pt::point& p1, const pt::point& p2, const pt::point& center, const SDL_Color& color) {
         aalineRGBA(renderer,
                    p1.x + center.x, p1.y + center.y,
                    p2.x + center.x, p2.y + center.y,
                    color.r, color.g, color.b, color.a);
     }
 
-    inline void draw(const pt::Circle<int>& circle, const ColorScheme& colorScheme) {
+    inline void draw(const pt::Circle& circle, const ColorScheme& colorScheme) {
         aacircleRGBA(renderer,
                      circle.center.x,
                      circle.center.y,
@@ -109,15 +109,15 @@ public:
         );
     }
 
-    inline void draw(const pt::Polygon<int>& polygon, const ColorScheme& colorScheme) {
-        pt::point<int> p, p2;
+    inline void draw(const pt::Polygon& polygon, const ColorScheme& colorScheme) {
+        pt::point p, p2;
         float base_angle = DEGREES_TO_RADIAN(polygon.angle);
         float radius, angle;
         for(auto it = polygon.points.begin();
             it != --polygon.points.end();) {
-            p = other_things::rotatePointInt(other_things::angle(*it) - base_angle, other_things::radius(pt::point<int>{it->x, it->y}));
+            p = other_things::rotatePointInt(other_things::angle(*it) - base_angle, other_things::radius(pt::point{it->x, it->y}));
             ++it;
-            p2 = other_things::rotatePointInt(other_things::angle(*it) - base_angle, other_things::radius(pt::point<int>{it->x, it->y}));
+            p2 = other_things::rotatePointInt(other_things::angle(*it) - base_angle, other_things::radius(pt::point{it->x, it->y}));
 
             aalineRGBA(renderer,
                      polygon.center.x + p.x,
@@ -131,9 +131,9 @@ public:
             );
         }
         p = other_things::rotatePointInt(other_things::angle(polygon.points.at(0)) - base_angle,
-                                 other_things::radius(pt::point<int>{polygon.points.at(0).x, polygon.points.at(0).y}));
+                                 other_things::radius(pt::point{polygon.points.at(0).x, polygon.points.at(0).y}));
         p2 = other_things::rotatePointInt(other_things::angle(*polygon.points.rbegin()) - base_angle,
-                                  other_things::radius(pt::point<int>{polygon.points.rbegin()->x, polygon.points.rbegin()->y}));
+                                  other_things::radius(pt::point{polygon.points.rbegin()->x, polygon.points.rbegin()->y}));
         aalineRGBA(renderer,
                  polygon.center.x + p.x,
                  polygon.center.y + p.y,
@@ -145,7 +145,6 @@ public:
                  colorScheme.rim.a
         );
     }
-
 
     inline void draw(SDL_Texture* texture, SDL_Rect& rec) {
         SDL_RenderCopy(renderer, texture, nullptr, &rec);

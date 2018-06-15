@@ -20,7 +20,7 @@
 #include "Box2D/Dynamics/b2Body.h"
 #include "Box2D/Dynamics/b2TimeStep.h"
 
-// Point-to-point constraint
+// point-to-point constraint
 // Cdot = v2 - v1
 //      = v2 + cross(w2, r2) - v1 - cross(w1, r1)
 // J = [-I -r1_skew I r2_skew ]

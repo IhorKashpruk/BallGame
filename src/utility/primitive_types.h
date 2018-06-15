@@ -8,80 +8,83 @@
 #include "math_things.h"
 
 namespace pt {
-    template<typename T = int>
     struct size {
-        T w, h;
-        size<T> operator+(const size& l) {
-            return size<T> { w + l.w, h + l.h};
+        int w, h;
+        size operator+(const size& l) {
+            return size { w + l.w, h + l.h};
         }
     };
 
-    template<typename T = int>
     struct point {
-        T x, y;
-        point<T> operator+(const point<T>& p) {
+        int x, y;
+        point operator+(const point& p) const {
             return { x + p.x, y + p.y };
         }
-        point<T> operator-(const point<T>& p) {
+        point operator-(const point& p) const {
             return { x - p.x, y - p.y };
         }
-        point<T> operator*(const point<T>& p) {
+        point operator*(const point& p) const {
             return { x * p.x, y + p.y };
         }
-        point<T> operator/(const point<T>& p) {
+        point operator/(const point& p) const {
             return { x / p.x, y / p.y };
+        }
+        point& operator+=(const point& p) {
+            x += p.x;
+            y += p.y;
+            return *this;
+        }
+        point& operator-=(const point& p) {
+            x -= p.x;
+            y -= p.y;
+            return *this;
         }
     };
 
-    template<class T>
     struct Shape {
-        static_assert(std::is_arithmetic<T>::value,
-                      "T must be arithmetic types.\n");
-        typedef point<T> Point;
-        explicit Shape(Point center, float angle)
+        explicit Shape(point center, float angle)
                 : center(std::move(center)), angle(angle) {}
         Shape() = default;
         virtual ~Shape() = default;
-        Point center;
+        point center;
         float angle;
     };
 
-    template<class T>
-    struct Circle : public Shape<T> {
-        Circle(typename Shape<T>::Point center, float angle, T radius)
-                : Shape<T>(center, angle),
+    struct Circle : public Shape {
+        Circle(point center, float angle, int radius)
+                : Shape(center, angle),
                   radius(radius) {}
         Circle() = default;
-        T radius;
+        int radius;
     };
 
-    template <class T>
-    struct Rectangle : public Shape<T> {
-        typedef size<T> Size;
-        Rectangle(typename Shape<T>::Point center, float angle, Size size)
-                : Shape<T>(center, angle),
+    struct Rectangle : public Shape {
+        Rectangle(point center, float angle, size size)
+                : Shape(center, angle),
                   size_(size) {}
         Rectangle() = default;
-        Size size_;
+        size size_;
     };
 
-    template <class T>
-    struct Polygon : public Shape<T> {
-        template <template <class> class ...P>
-        Polygon(typename Shape<T>::Point center, float angle, P<T>&&... points)
-                : Shape<T>(center, angle), points{std::move(points)...} {}
-        template <template <class> class ...P>
-        Polygon(typename Shape<T>::Point center, float angle, P<T>&... points)
-                : Shape<T>(center, angle), points{(points)...} {}
-        Polygon(typename Shape<T>::Point center, float angle, std::vector<typename Shape<T>::Point>&& points)
-                : Shape<T>(center, angle), points{std::move(points)} {}
+    struct Polygon : public Shape {
+        template <class ...P>
+        Polygon(point center, float angle, P&&... points)
+                : Shape(center, angle), points{std::move(points)...} {}
+        template <class ...P>
+        Polygon(point center, float angle, P&... points)
+                : Shape(center, angle), points{(points)...} {}
+        Polygon(point center, float angle, std::vector<point>&& points)
+                : Shape(center, angle), points{std::move(points)} {}
         Polygon() = default;
-        std::vector<typename Shape<T>::Point> points {};
+        std::vector<point> points {};
     };
 
-    template <class T>
-    T distance(const pt::point<T> &p1, const pt::point<T> &p2) {
-        return std::sqrt((p2.x - p1.x) * (p2.x - p1.x)
+    bool inside(const int target, const int lh, const int rh) {
+        return (target >= lh && target <= rh);
+    }
+
+    float distance(const point& p1, const point& p2) {
+        return std::sqrt((float)(p2.x - p1.x) * (p2.x - p1.x)
                          + (p2.y - p1.y) * (p2.y - p1.y));
     }
 
@@ -89,121 +92,115 @@ namespace pt {
         return std::abs(p1 - p2);
     }
 
-    bool under(const Circle<int>& circle, const point<int>& point) {
-        return (distance(circle.center, point) <= circle.radius);
+    bool under(const Circle& circle, const point& p) {
+        return (distance(circle.center, p) <= circle.radius);
     }
 
-    bool under(Circle<int>&& circle, const point<int>& point) {
-        return under(circle, point);
+    bool under(Circle&& circle, const point& p) {
+        return under(circle, p);
     }
 
-    bool under(const Circle<int>& circle, point<int>&& point) {
-        return under(circle, point);
+    bool under(const Circle& circle, point&& p) {
+        return under(circle, p);
     }
-    bool under(Circle<int>&& circle, point<int>&& point) {
-        return under(circle, point);
+    bool under(Circle&& circle, point&& p) {
+        return under(circle, p);
     }
 
-    bool under(const Rectangle<int>& rectangle, const point<int>& point) {
-        pt::point<int> p = {rectangle.center.x + rectangle.size_.w, rectangle.center.y + rectangle.size_.h};
-        if(!under(Circle<int>{rectangle.center,
-                              rectangle.angle,
-                              distance(rectangle.center, p)}, point)) {
+    bool under(const Rectangle& rectangle, const point& p) {
+        return (inside(p.x, rectangle.center.x - rectangle.size_.w, rectangle.center.x + rectangle.size_.w))
+               && (inside(p.y, rectangle.center.y - rectangle.size_.h, rectangle.center.y + rectangle.size_.h));
+        point p2 = {rectangle.center.x + rectangle.size_.w, rectangle.center.y + rectangle.size_.h};
+        if(!under(Circle{rectangle.center,
+                         rectangle.angle,
+                         (int)std::round(distance(rectangle.center, p2))}, p)) {
             return false;
         }
-        return ((distance(rectangle.center.x, point.x) < rectangle.size_.w)
-               && (distance(rectangle.center.y, point.y) < rectangle.size_.h));
+        return ((distance(rectangle.center.x, p.x) < rectangle.size_.w)
+               && (distance(rectangle.center.y, p.y) < rectangle.size_.h));
     }
-    bool under(const Rectangle<int>& rectangle, point<int>&& point) {
-        return under(rectangle, point);
+    bool under(const Rectangle& rectangle, point&& p) {
+        return under(rectangle, p);
     }
-    bool under(Rectangle<int>&& rectangle, const point<int>& point) {
-        return under(rectangle, point);
+    bool under(Rectangle&& rectangle, const point& p) {
+        return under(rectangle, p);
     }
-    bool under(Rectangle<int>&& rectangle, point<int>&& point) {
-        return under(rectangle, point);
+    bool under(Rectangle&& rectangle, point&& p) {
+        return under(rectangle, p);
     }
 
-    bool under(const Polygon<int>& polygon, const point<int>& point) {
-        auto max = [](const std::vector<pt::point<int>>& points) -> int {
+    bool under(const Polygon& polygon, const point& p) {
+        auto max = [](const std::vector<pt::point>& points) -> int {
             int max_value = 0;
-            for(const pt::point<int> p: points){
-                auto max_tmp1 = std::max(std::abs(p.x), std::abs(p.y));
+            for(const pt::point& p2: points){
+                auto max_tmp1 = std::max(std::abs(p2.x), std::abs(p2.y));
                 max_value = std::max(max_value, max_tmp1);
             }
             return max_value;
         };
 
-        if(!under(Circle<int>{polygon.center,
-                              polygon.angle,
-                              max(polygon.points)}, point)) {
+        if(!under(Circle {polygon.center,
+                          polygon.angle,
+                          max(polygon.points)}, p)) {
             return false;
         }
 
         return false;
     }
 
-    bool under(Polygon<int>&& polygon, const point<int>& point) {
-        return under(polygon, point);
+    bool under(Polygon&& polygon, const point& p) {
+        return under(polygon, p);
     }
-    bool under(const Polygon<int>& polygon, point<int>&& point) {
-        return under(polygon, point);
+    bool under(const Polygon& polygon, point&& p) {
+        return under(polygon, p);
     }
-    bool under(Polygon<int>&& polygon, point<int>&& point) {
-        return under(polygon, point);
-    }
-
-    void move(Circle<int>& circle, const point<int>& point) {
-        circle.center.x += (point.x - (circle.radius + circle.center.x));
-        circle.center.y += (point.y - (circle.radius + circle.center.y));
+    bool under(Polygon&& polygon, point&& p) {
+        return under(polygon, p);
     }
 
-    void move(Rectangle<int>& rectangle, const point<int>& point) {
-        rectangle.center.x += (point.x - (rectangle.size_.w + rectangle.center.x));
-        rectangle.center.y += (point.y - (rectangle.size_.h + rectangle.center.y));
+    void move(Circle& circle, const point& p) {
+        point p2 = p;
+        p2.y = circle.center.y;
+        if(!under(circle, p2)) {
+            circle.center.x +=
+                    (p.x -
+                     ((p.x > circle.center.x)
+                      ? (circle.radius + circle.center.x)
+                      : (circle.center.x - circle.radius)));
+        }
+        p2.y = p.y;
+        p2.x = circle.center.x;
+        if(!under(circle, p2)) {
+            circle.center.y +=
+                    (p.y -
+                            ((p.y > circle.center.y)
+                             ? (circle.radius + circle.center.y)
+                             : (circle.center.y - circle.radius)));
+        }
     }
 
-    bool under(const Rectangle<int>& rec1, const Rectangle<int>& rec2) {
+    void move(Rectangle& rectangle, const point& p) {
+        if(!inside(p.x, (rectangle.center.x - rectangle.size_.w), (rectangle.center.x + rectangle.size_.w))) {
+            rectangle.center.x +=
+                    (p.x -
+                            ((p.x > rectangle.center.x)
+                             ? (rectangle.size_.w + rectangle.center.x)
+                             : (rectangle.center.x - rectangle.size_.w)));
+        }
+        if(!inside(p.y, (rectangle.center.y - rectangle.size_.h), (rectangle.center.y + rectangle.size_.h))) {
+            rectangle.center.y +=
+                    (p.y -
+                            ((p.y > rectangle.center.y)
+                             ? (rectangle.size_.h + rectangle.center.y)
+                             : (rectangle.center.y - rectangle.size_.h)));
+        }
+    }
+
+    bool under(const Rectangle& rec1, const Rectangle& rec2) {
         return !(((rec1.center.x + rec1.size_.w) > (rec2.center.x - rec2.size_.w))
                  || ((rec1.center.x - rec1.size_.w) > (rec2.center.x + rec2.size_.w))
                  || ((rec1.center.y - rec1.size_.h) > (rec2.center.y + rec2.size_.h))
                  || ((rec1.center.y + rec1.size_.h) > (rec2.center.y - rec2.size_.h)));
-    }
-
-    template <class from, class to>
-    point<to> convert(const point<from>& point, to (*conv_f)(from)) {
-        return {conv_f(point.x), conv_f(point.y)};
-    }
-
-    template <class from, class to>
-    size<to> convert(const size<from>& point, to (*conv_f)(from)) {
-        return {conv_f(point.w), conv_f(point.h)};
-    }
-
-    template <class from, class to>
-    std::vector<pt::point<to>> convert(const std::vector<pt::point<from>>& points, to (*conv_f)(from)) {
-        std::vector<pt::point<to>> tmp;
-        tmp.resize(points.size());
-        std::transform(points.begin(), points.end(), tmp.begin(),
-                       [&conv_f](const pt::point<from>& it) -> pt::point<to> {
-                           return {conv_f(it.x), conv_f(it.y)};
-                       }
-        );
-        return tmp;
-    }
-
-    template <class from, class to>
-    Circle<to> convert(const Circle<from>& circle, to (*conv_f)(from), float (*conv_f_a)(from)) {
-        return {convert(circle.center, conv_f), conv_f_a(circle.angle), conv_f(circle.radius)};
-    }
-
-    template <class from, class to>
-    Rectangle<to> convert(const Rectangle<from>& rectangle, to (*conv_f)(from), float (*conv_f_a)(from)) {
-        return {convert(rectangle.center, conv_f), conv_f_a(rectangle.angle), convert(rectangle.size_, conv_f)};
-    }
-    template <class from, class to>
-    Polygon<to> convert(const Polygon<from>& poligon, to (*conv_f)(from), float (*conv_f_a)(from)) {
-        return {convert(poligon.center, conv_f), conv_f_a(poligon.angle), convert(poligon.points, conv_f)};
     }
 }
 

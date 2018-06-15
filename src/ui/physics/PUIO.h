@@ -19,8 +19,6 @@ enum class EntityCategory {
 };
 
 class PUIO : public AUIO, public box2d::PO, public IContactResponder {
-    typedef int T;
-    typedef pt::point<T> Point;
 public:
 
     explicit PUIO(std::string id,
@@ -52,27 +50,27 @@ public:
         AUIO::update();
     }
 
-    bool under(Point &&point) override {
+    bool under(pt::point&& p) override {
         return false;
     }
 
-    bool under(const Point &point) override {
+    bool under(const pt::point& p) override {
         return false;
     }
 
-    bool under(const pt::Circle<int> &circle) const override {
+    bool under(const pt::Circle& circle) const override {
         return true;
     }
 
-    bool under(const pt::Rectangle<int> &rectangle) const override {
+    bool under(const pt::Rectangle& rectangle) const override {
         return true;
     }
 
-    bool under(const pt::Polygon<int> &polygon) const override {
+    bool under(const pt::Polygon& polygon) const override {
         return true;
     }
 
-    Point center() const override {
+    pt::point center() const override {
         return other_things::toPoint(body_->GetPosition());
     }
 
@@ -85,34 +83,47 @@ public:
         for(b2Fixture* fixture = body_->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
             b2Shape::Type shapeType = fixture->GetType();
             if (shapeType == b2Shape::e_circle) {
-                pt::Circle<int> circle = other_things::toCirce(body_, (b2CircleShape*)fixture->GetShape());
+                pt::Circle circle = other_things::toCirce(body_, (b2CircleShape*)fixture->GetShape());
                 Draftsman::getInstance().draw(circle, colorScheme_);
             }
             else if (shapeType == b2Shape::e_polygon) {
-                pt::Polygon<int> polygon = other_things::toPolygon(body_, (b2PolygonShape*)fixture->GetShape());
+                pt::Polygon polygon = other_things::toPolygon(body_, (b2PolygonShape*)fixture->GetShape());
                 Draftsman::getInstance().draw(polygon, colorScheme_);
             }
         }
     }
 
-    void draw(const Point &offset) override {
-
+    void draw(const pt::point& offset) override {
+        for(b2Fixture* fixture = body_->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
+            b2Shape::Type shapeType = fixture->GetType();
+            if (shapeType == b2Shape::e_circle) {
+                pt::Circle circle = other_things::toCirce(body_, (b2CircleShape*)fixture->GetShape());
+                // Add offset
+                circle.center -= offset;
+                Draftsman::getInstance().draw(circle, colorScheme_);
+            }
+            else if (shapeType == b2Shape::e_polygon) {
+                pt::Polygon polygon = other_things::toPolygon(body_, (b2PolygonShape*)fixture->GetShape());
+                polygon.center -= offset;
+                Draftsman::getInstance().draw(polygon, colorScheme_);
+            }
+        }
     }
 
-    void clickLeftButton(const Point& point) override {
-        notify(Signal{this, STATE::LEFT_BUTTON_CLICK, point});
+    void clickLeftButton(const pt::point& p) override {
+        notify(Signal{this, STATE::LEFT_BUTTON_CLICK, p});
     }
 
-    void clickRightButton(const Point& point) override {
-        notify(Signal{this, STATE::RIGHT_BUTTON_CLICK, point});
+    void clickRightButton(const pt::point& p) override {
+        notify(Signal{this, STATE::RIGHT_BUTTON_CLICK, p});
     }
 
     void enterKey(const char* key) override {
         notify(Signal{this, STATE::ENTER_KEY, key});
     }
 
-    void mouseMove(const Point& point) override {
-        notify(Signal{this, STATE::MOUSE_MOVE, point});
+    void mouseMove(const pt::point& p) override {
+        notify(Signal{this, STATE::MOUSE_MOVE, p});
     }
 
     EntityCategory getEntityCategory() const {

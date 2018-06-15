@@ -4,12 +4,11 @@
 #include "../../utility/primitive_types.h"
 
 class IResponsible {
-    typedef pt::point<int> Point;
 public:
-    virtual void clickLeftButton(const Point& point) = 0;
-    virtual void clickRightButton(const Point& point) = 0;
+    virtual void clickLeftButton(const pt::point& p) = 0;
+    virtual void clickRightButton(const pt::point& p) = 0;
     virtual void enterKey(const char* key) = 0;
-    virtual void mouseMove(const Point& point) = 0;
+    virtual void mouseMove(const pt::point& p) = 0;
     virtual ~IResponsible() = default;
 };
 
